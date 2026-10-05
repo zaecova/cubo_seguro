@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "dA64SaRp8_hhHUJ6fCm4d"
+uri = "file://drive-duplicate-actions.csv"
+type = "table"
+title = "Duplicate-file action list"
+description = "All 22 files in the 10 checksum-matched groups, with exact file IDs and keep/remove/review recommendations. No files have been changed."
+logical_id = "8bbc69a8-00f9-4306-bd9a-7ce51ccd7237"
+content_hash = "sha256:aafe6fe1a8b0b1e319a36576f0f99073dd4c330f7300c4ba25761c2d96520c5b"
+size = 3205
+mtime_ms = 1791166451194
+storage_uri = "gcs://replit-rams-assets-worf/rams/assets/conversation:13222ae3-c18f-4692-a7f5-c650d9934b64/8bbc69a8-00f9-4306-bd9a-7ce51ccd7237/eb1d5282-304e-4daa-8f69-68de09311d45"
+storage_version_token = "1791166454981523"
+content_type = "text/csv"

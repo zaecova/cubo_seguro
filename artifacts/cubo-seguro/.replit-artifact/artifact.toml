@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Cubo Seguro"
+description = "Evaluador de riesgos de ciberseguridad basado en McCumber, con evidencia de Google Drive y propuestas de IA sujetas a aprobación humana."
+version = "1.0.0"
+id = "artifacts/cubo-seguro"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21176
+
+[services.development]
+run = "pnpm --filter @workspace/cubo-seguro run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cubo-seguro", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/cubo-seguro/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21176"
+BASE_PATH = "/"

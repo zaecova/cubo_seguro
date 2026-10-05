@@ -1,0 +1,1 @@
+- [Evaluación y fuentes](evaluacion-fuentes.md) — El cubo de McCumber debe separar evidencia documental de inferencias de IA y exigir aprobación individual.

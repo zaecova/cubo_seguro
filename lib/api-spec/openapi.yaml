@@ -11,6 +11,38 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /cyber/sources:
+    get:
+      operationId: getSources
+      responses:
+        "200":
+          description: Source inventory
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SourceInventory" }
+  /cyber/sync:
+    post:
+      operationId: syncSources
+      responses:
+        "200":
+          description: Refreshed source inventory
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SourceInventory" }
+  /cyber/analyze:
+    post:
+      operationId: analyzeRisk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RiskInput" }
+      responses:
+        "200":
+          description: AI proposals awaiting human review
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RiskAnalysis" }
   /healthz:
     get:
       operationId: healthCheck
@@ -26,6 +58,65 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    Source:
+      type: object
+      required: [id, name, folder, url, status, text, note]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        folder: { type: string }
+        url: { type: string }
+        status: { type: string, enum: [read, pending, error] }
+        text: { type: string }
+        note: { type: string }
+    SourceInventory:
+      type: object
+      required: [sources, syncedAt, warning]
+      properties:
+        sources:
+          type: array
+          items: { $ref: "#/components/schemas/Source" }
+        syncedAt: { type: string }
+        warning: { type: string }
+    RiskInput:
+      type: object
+      required: [title, threat, vulnerability, information]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        threat: { type: string, minLength: 3, maxLength: 3000 }
+        vulnerability: { type: string, minLength: 3, maxLength: 3000 }
+        information: { type: string, minLength: 3, maxLength: 3000 }
+    Evidence:
+      type: object
+      required: [sourceId, sourceName, url, quote]
+      properties:
+        sourceId: { type: string }
+        sourceName: { type: string }
+        url: { type: string }
+        quote: { type: string }
+    Proposal:
+      type: object
+      required: [id, dimension, category, text, rationale, evidence]
+      properties:
+        id: { type: string }
+        dimension: { type: string, enum: [principle, state, information, countermeasure] }
+        category: { type: string }
+        text: { type: string }
+        rationale: { type: string }
+        evidence:
+          type: array
+          items: { $ref: "#/components/schemas/Evidence" }
+    RiskAnalysis:
+      type: object
+      required: [id, createdAt, input, proposals, warning]
+      properties:
+        id: { type: string }
+        createdAt: { type: string }
+        input: { $ref: "#/components/schemas/RiskInput" }
+        proposals:
+          type: array
+          items: { $ref: "#/components/schemas/Proposal" }
+        warning: { type: string }
     HealthStatus:
       type: object
       properties:
