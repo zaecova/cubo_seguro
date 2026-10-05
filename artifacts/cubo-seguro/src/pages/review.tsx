@@ -150,14 +150,14 @@ function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChan
           )}
 
           <div className="mt-4 grid gap-3 xl:grid-cols-2">
-            <div className="rounded-md bg-muted/60 p-3 text-sm">
-              <div className="mb-1 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"><Brain className="h-3 w-3" />Inferencia de la IA</div>
+            <div className="rounded-lg border-2 border-violet-300 border-l-[5px] border-l-violet-600 bg-violet-50 p-4 text-sm text-violet-950 shadow-sm">
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-violet-800"><Brain className="h-5 w-5 shrink-0" />Inferencia de la IA</div>
               <p className="leading-relaxed">{p.rationale}</p>
             </div>
-            <div className="rounded-md border border-primary/25 p-3 text-sm">
-              <div className="mb-1 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-primary"><Quote className="h-3 w-3" />Evidencia documental</div>
+            <div className="rounded-lg border-2 border-teal-300 border-l-[5px] border-l-teal-700 bg-teal-50 p-4 text-sm text-teal-950 shadow-sm">
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-teal-800"><Quote className="h-5 w-5 shrink-0" />Evidencia documental</div>
               {p.evidence.length === 0 ? (
-                <p className="text-muted-foreground" data-testid={`text-no-evidence-${p.id}`}>Sin cita de Drive. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en tus documentos.</p>
+                <p className="text-teal-900" data-testid={`text-no-evidence-${p.id}`}>Sin cita de Drive. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en tus documentos.</p>
               ) : (
                 <ul className="space-y-3">
                   {p.evidence.map((e, i) => (
