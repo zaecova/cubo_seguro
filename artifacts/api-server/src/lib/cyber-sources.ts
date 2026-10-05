@@ -3,17 +3,19 @@ import { GetSourcesResponse } from "@workspace/api-zod";
 import type { z } from "zod";
 
 type Inventory = z.infer<typeof GetSourcesResponse>;
-const folders = [
-  { id: "1Kpdf9lzM8nCdC09HyLnbpzzpiFy175yj", name: "Principios de ciberseguridad" },
-  { id: "1T_1KB3r-X5GUz1ht-lDIlFAhgw02gLjf", name: "Fundamentos de Ciberseguridad" },
-];
+const rootFolder = { id: "1rXkfXrQTjHm-u8f9ilHTVV6nZlo5VchJ", name: "Gestión de ciberseguridad" };
 let cache: Inventory | undefined;
 let inFlight: Promise<Inventory> | undefined;
 
 async function load(): Promise<Inventory> {
   const connector = new ReplitConnectors();
   const sources: Inventory["sources"] = [];
+  const folders = [{ ...rootFolder }];
+  const visited = new Set<string>();
+  const seenFiles = new Set<string>();
   for (const folder of folders) {
+    if (visited.has(folder.id)) continue;
+    visited.add(folder.id);
     let pageToken = "";
     do {
       const params = new URLSearchParams({
@@ -29,10 +31,21 @@ async function load(): Promise<Inventory> {
       };
       if (data.incompleteSearch) throw new Error("Drive devolvió un inventario incompleto. Intenta sincronizar nuevamente.");
       for (const file of data.files) {
+        if (file.mimeType === "application/vnd.google-apps.folder") {
+          folders.push({
+            id: file.id,
+            name: folder.id === rootFolder.id ? file.name.trim() : `${folder.name} / ${file.name.trim()}`,
+          });
+          continue;
+        }
+        if (seenFiles.has(file.id)) continue;
+        seenFiles.add(file.id);
         const source: Inventory["sources"][number] = {
           id: file.id, name: file.name, folder: folder.name,
           url: file.webViewLink || "", status: "pending", text: "",
-          note: "PDF pendiente de extracción. No se utiliza como evidencia en el análisis.",
+          note: file.mimeType === "application/pdf"
+            ? "PDF pendiente de extracción. No se utiliza como evidencia en el análisis."
+            : "Formato pendiente de procesamiento. No se utiliza como evidencia en el análisis.",
         };
         if (["application/vnd.google-apps.document", "application/vnd.google-apps.presentation"].includes(file.mimeType)) {
           try {
@@ -57,7 +70,7 @@ async function load(): Promise<Inventory> {
   return GetSourcesResponse.parse({
     sources: sources.sort((a, b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name, "es", { numeric: true })),
     syncedAt: new Date().toISOString(),
-    warning: "Cobertura parcial: solo los documentos marcados como leídos respaldan el análisis. Los PDF pendientes no han sido interpretados. Las inferencias de IA requieren revisión humana.",
+    warning: `Se revisaron ${visited.size - 1} carpetas dentro de Gestión de ciberseguridad. Cobertura parcial: solo los documentos marcados como leídos respaldan el análisis. Los archivos pendientes no han sido interpretados. Las inferencias de IA requieren revisión humana.`,
   });
 }
 
