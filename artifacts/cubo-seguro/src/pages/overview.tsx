@@ -110,7 +110,7 @@ export default function Overview() {
           </div>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Button type="submit" size="lg" disabled={!valid || analyze.isPending} data-testid="button-analyze">
-              {analyze.isPending ? <><Loader2 className="h-4 w-4 animate-spin" />Analizando con fuentes…</> : <><Sparkles className="h-4 w-4" />Generar propuestas</>}
+              {analyze.isPending ? <><Loader2 className="h-4 w-4 animate-spin" />Analizando con fuentes…</> : <><Sparkles className="h-4 w-4" />Generar 3 propuestas</>}
             </Button>
             {(form.title || form.threat) && !analyze.isPending && (
               <Button type="button" variant="ghost" onClick={() => { setForm(EMPTY); setIsExample(false); }} data-testid="button-clear">Limpiar</Button>
@@ -124,7 +124,7 @@ export default function Overview() {
           <ol className="space-y-4">
             {[
               ["01", "Describe", "Amenaza, vulnerabilidad e información afectada."],
-              ["02", "La IA propone", "Clasifica en las tres dimensiones del cubo, citando Drive cuando puede."],
+              ["02", "La IA propone", "Solo tres propuestas: principios de seguridad, estados de la información y contramedidas, con citas de Drive cuando hay respaldo."],
               ["03", "Distingue", "Cita literal del documento separada de la inferencia del modelo."],
               ["04", "Aprueba", "Nada cuenta hasta que tú lo marcas. Solo lo aprobado se exporta."],
             ].map(([n, t, d]) => (

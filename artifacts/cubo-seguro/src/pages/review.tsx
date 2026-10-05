@@ -75,6 +75,7 @@ export default function Review() {
           {a.proposals.length === 0 && <p className="text-sm text-muted-foreground">El análisis no devolvió propuestas.</p>}
           {DIMENSION_ORDER.map((d) => {
             const ps = a.proposals.filter((p) => p.dimension === d);
+            if (ps.length === 0) return null;
             return (
               <section key={d} aria-labelledby={`h-${d}`}>
                 <div className="mb-3 flex items-baseline gap-3">
