@@ -46,7 +46,7 @@ export default function Review() {
         </div>
       </PageHead>
 
-      <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
+      <div className="grid gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
           <div className="rounded-xl border border-card-border bg-card p-5 text-sm">
             {(["threat", "vulnerability", "information"] as const).map((k) => (
@@ -113,21 +113,21 @@ function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChan
   return (
     <article className={`relative rounded-xl border p-5 transition-colors ${tone}`} data-testid={`card-proposal-${p.id}`}>
       {r.status !== "pending" && (
-        <span className={`pop stamp absolute right-4 top-4 rounded px-2 py-0.5 font-mono text-[10px] uppercase ${r.status === "approved" ? "text-primary" : "text-destructive"}`} data-testid={`status-proposal-${p.id}`}>
+        <span className={`pop stamp mb-3 inline-block rounded px-2 py-0.5 font-mono text-[10px] uppercase ${r.status === "approved" ? "text-primary" : "text-destructive"}`} data-testid={`status-proposal-${p.id}`}>
           {r.status === "approved" ? "Aprobada" : "Rechazada"}
         </span>
       )}
       <div className="flex items-start gap-4">
         <Checkbox
           id={`ap-${p.id}`}
-          className="mt-1 h-5 w-5"
+          className="mt-1 h-5 w-5 shrink-0"
           checked={r.status === "approved"}
           disabled={editing}
           onCheckedChange={(v) => onChange({ ...r, status: v ? "approved" : "pending" })}
           aria-label="Aprobar propuesta"
           data-testid={`checkbox-approve-${p.id}`}
         />
-        <div className="min-w-0 flex-1 pr-16">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-widest">
             <span className="rounded bg-secondary px-1.5 py-0.5">{p.category}</span>
             <span className="text-muted-foreground">Propuesta IA</span>
@@ -137,7 +137,7 @@ function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChan
             <div className="mt-3 space-y-2">
               <Textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} aria-label="Editar texto" data-testid={`input-edit-${p.id}`} />
               <p className="text-xs text-muted-foreground">Guardar una edición devuelve la propuesta a pendiente; tendrás que aprobarla de nuevo.</p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button size="sm" onClick={saveEdit} disabled={!draft.trim()} data-testid={`button-save-edit-${p.id}`}>Guardar edición</Button>
                 <Button size="sm" variant="ghost" onClick={() => { setDraft(finalText(p, r)); setEditing(false); }}>Cancelar</Button>
               </div>
@@ -149,7 +149,7 @@ function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChan
             <p className="mt-2 border-l-2 border-border pl-3 text-xs text-muted-foreground"><span className="font-mono uppercase">Original IA:</span> {p.text}</p>
           )}
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="mt-4 grid gap-3 xl:grid-cols-2">
             <div className="rounded-md bg-muted/60 p-3 text-sm">
               <div className="mb-1 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"><Brain className="h-3 w-3" />Inferencia de la IA</div>
               <p className="leading-relaxed">{p.rationale}</p>

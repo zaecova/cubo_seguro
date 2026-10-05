@@ -67,7 +67,7 @@ export default function Fuentes() {
               <p className="mt-1 text-sm text-muted-foreground">Sincroniza para traer el inventario de la carpeta de Drive.</p>
             </div>
           ) : (
-            <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
               <div className="space-y-6">
                 {folders.map((f) => (
                   <div key={f}>
@@ -78,8 +78,8 @@ export default function Fuentes() {
                           <button onClick={() => setSel(s.id)} aria-pressed={sel === s.id} className={`flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-muted/50 ${sel === s.id ? "bg-muted" : ""}`} data-testid={`button-source-${s.id}`}>
                             <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                             <div className="min-w-0 flex-1">
-                              <div className="truncate text-sm font-medium">{s.name}</div>
-                              {s.note && <div className="truncate text-xs text-muted-foreground">{s.note}</div>}
+                              <div className="whitespace-normal text-sm font-medium">{s.name}</div>
+                              {s.note && <div className="whitespace-normal text-xs text-muted-foreground">{s.note}</div>}
                             </div>
                             <span className={`rounded px-2 py-0.5 font-mono text-[10px] uppercase ${STATUS[s.status].cls}`}>{STATUS[s.status].label}</span>
                           </button>
@@ -94,7 +94,7 @@ export default function Fuentes() {
                   <div className="grid-paper flex h-64 items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Selecciona un documento para ver el texto exacto que la IA puede citar.</div>
                 ) : (
                   <div className="rise rounded-xl border border-card-border bg-card" data-testid="panel-source">
-                    <div className="flex items-start justify-between gap-3 border-b border-border p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border p-5">
                       <div className="min-w-0">
                         <h2 className="font-display text-xl">{current.name}</h2>
                         <div className="mt-1 font-mono text-[11px] text-muted-foreground">{current.folder}</div>
