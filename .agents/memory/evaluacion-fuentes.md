@@ -8,6 +8,12 @@ Presentar solamente tres propuestas para decidir: una por cada dimensión del cu
 
 **Why:** El usuario pidió reducir las propuestas a tres basadas en las tres dimensiones.
 
+La paleta solicitada para este aplicativo es azul, amarillo, verde, naranja, blanco y negro.
+
+**Why:** El usuario pidió aplicar esos colores al diseño teniendo en cuenta la contaminación visual.
+
+**How to apply:** Usar superficies claras y acentos contenidos; distinguir IA y evidencia con etiquetas además del color, sin introducir violeta o rojo.
+
 **Why:** Quiere decidir si está de acuerdo con la información de IA mediante casillas de aprobación, y distinguirla de la información considerada de Drive.
 
 **How to apply:** Mantener separadas evidencia documental e inferencias; no preaprobar propuestas ni presentar archivos pendientes como leídos. El usuario amplió el alcance a todas las carpetas dentro de Gestión de ciberseguridad, no solo las dos iniciales. Trabajar en modo de solo lectura sobre ese árbol, sin incorporar otras carpetas de Drive.

@@ -381,6 +381,45 @@
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.05;
 background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 .font-display{font-family:var(--app-font-serif);letter-spacing:-0.02em}
+/* Restricted palette: neutral surfaces, blue navigation, yellow accents,
+   green evidence and orange warnings. Tints keep large areas restful. */
+:root, .dark {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
+  --border: 0 0% 83%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --card-border: 0 0% 83%;
+  --sidebar: 218 72% 18%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 218 65% 30%;
+  --sidebar-primary: 48 100% 55%;
+  --sidebar-primary-foreground: 0 0% 5%;
+  --sidebar-accent: 218 70% 28%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 48 100% 55%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+  --popover-border: 0 0% 83%;
+  --primary: 218 80% 36%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 218 80% 96%;
+  --secondary-foreground: 218 80% 22%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 35%;
+  --accent: 48 100% 55%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 25 90% 32%;
+  --destructive-foreground: 0 0% 100%;
+  --input: 0 0% 70%;
+  --ring: 218 80% 36%;
+  --chart-1: 218 80% 36%;
+  --chart-2: 48 100% 55%;
+  --chart-3: 135 60% 30%;
+  --chart-4: 25 90% 45%;
+  --chart-5: 0 0% 15%;
+}
+body::before { display: none; }
 /* Let long filenames, citations and AI text wrap instead of sizing the cards. */
 body { overflow-wrap: anywhere; }
 .grid > *, .flex > *, .inline-flex > * { min-width: 0; }

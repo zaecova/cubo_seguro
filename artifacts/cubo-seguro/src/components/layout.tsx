@@ -70,7 +70,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <Info className="h-3.5 w-3.5 text-sidebar-primary" /> Acceso y privacidad
         </button>
         <div className="flex items-center gap-2 font-mono text-[11px] text-sidebar-foreground/60" data-testid="status-api">
-          <span className={`h-2 w-2 rounded-full ${health.isLoading ? "bg-sidebar-foreground/40" : online ? "bg-emerald-400" : "bg-red-400"}`} />
+          <span className={`h-2 w-2 rounded-full ${health.isLoading ? "bg-sidebar-foreground/40" : online ? "bg-green-400" : "bg-orange-400"}`} />
           {health.isLoading ? "Comprobando servidor" : online ? "Servidor disponible" : "Servidor sin respuesta"}
         </div>
       </div>

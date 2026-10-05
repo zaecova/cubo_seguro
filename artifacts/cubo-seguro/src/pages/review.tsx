@@ -61,7 +61,7 @@ export default function Review() {
             <div className="mt-3 grid grid-cols-3 gap-2 text-center">
               <div><div className="font-display text-3xl text-sidebar-primary">{c.approved}</div><div className="text-[11px]">aprobadas</div></div>
               <div><div className="font-display text-3xl">{c.pending}</div><div className="text-[11px]">pendientes</div></div>
-              <div><div className="font-display text-3xl text-red-300">{c.rejected}</div><div className="text-[11px]">rechazadas</div></div>
+              <div><div className="font-display text-3xl text-orange-300">{c.rejected}</div><div className="text-[11px]">rechazadas</div></div>
             </div>
             <p className="mt-4 text-xs text-sidebar-foreground/70">La exportación incluye solo las aprobadas. Pendientes y rechazadas nunca aparecen como aprobadas.</p>
           </div>
@@ -150,14 +150,14 @@ function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChan
           )}
 
           <div className="mt-4 grid gap-3 xl:grid-cols-2">
-            <div className="rounded-lg border-2 border-violet-300 border-l-[5px] border-l-violet-600 bg-violet-50 p-4 text-sm text-violet-950 shadow-sm">
-              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-violet-800"><Brain className="h-5 w-5 shrink-0" />Inferencia de la IA</div>
+            <div className="rounded-lg border-2 border-blue-300 border-l-[5px] border-l-blue-700 bg-blue-50 p-4 text-sm text-black shadow-sm">
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-blue-900"><Brain className="h-5 w-5 shrink-0" />Inferencia de la IA</div>
               <p className="leading-relaxed">{p.rationale}</p>
             </div>
-            <div className="rounded-lg border-2 border-teal-300 border-l-[5px] border-l-teal-700 bg-teal-50 p-4 text-sm text-teal-950 shadow-sm">
-              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-teal-800"><Quote className="h-5 w-5 shrink-0" />Evidencia documental</div>
+            <div className="rounded-lg border-2 border-green-300 border-l-[5px] border-l-green-700 bg-green-50 p-4 text-sm text-black shadow-sm">
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />Evidencia documental</div>
               {p.evidence.length === 0 ? (
-                <p className="text-teal-900" data-testid={`text-no-evidence-${p.id}`}>Sin cita de Drive. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en tus documentos.</p>
+                <p className="text-black" data-testid={`text-no-evidence-${p.id}`}>Sin cita de Drive. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en tus documentos.</p>
               ) : (
                 <ul className="space-y-3">
                   {p.evidence.map((e, i) => (
