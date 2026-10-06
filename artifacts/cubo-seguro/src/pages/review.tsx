@@ -85,7 +85,7 @@ export default function Review() {
                 {ps.length === 0 ? (
                   <p className="rounded-md border border-dashed border-border px-4 py-3 text-sm text-muted-foreground">Sin propuestas para esta dimensión.</p>
                 ) : (
-                  <div className="space-y-4">{ps.map((p) => <ProposalCard key={p.id} p={p} ev={ev} onChange={(r) => setReview(p.id, r)} />)}</div>
+                  <div className="space-y-4">{ps.map((p) => <ProposalCard key={p.id} p={p} ev={ev} example={a.id.startsWith("ejemplos-mccumber-")} onChange={(r) => setReview(p.id, r)} />)}</div>
                 )}
               </section>
             );
@@ -96,7 +96,7 @@ export default function Review() {
   );
 }
 
-function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChange: (r: ProposalReview) => void }) {
+export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal; ev: Evaluation; onChange: (r: ProposalReview) => void; example?: boolean }) {
   const r = ev.reviews[p.id] ?? { status: "pending" };
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(finalText(p, r));
@@ -130,7 +130,7 @@ function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChan
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-widest">
             <span className="rounded bg-secondary px-1.5 py-0.5">{p.category}</span>
-            <span className="text-muted-foreground">Propuesta IA</span>
+            <span className="text-muted-foreground">{example ? "Ejemplo didáctico" : "Propuesta IA"}</span>
             {edited && <span className="rounded bg-accent px-1.5 py-0.5 text-accent-foreground" data-testid={`text-edited-${p.id}`}>Editada por persona</span>}
           </div>
           {editing ? (
@@ -146,18 +146,18 @@ function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChan
             <label htmlFor={`ap-${p.id}`} className={`mt-2 block cursor-pointer text-[15px] leading-relaxed ${r.status === "rejected" ? "line-through" : ""}`}>{finalText(p, r)}</label>
           )}
           {edited && !editing && (
-            <p className="mt-2 border-l-2 border-border pl-3 text-xs text-muted-foreground"><span className="font-mono uppercase">Original IA:</span> {p.text}</p>
+            <p className="mt-2 border-l-2 border-border pl-3 text-xs text-muted-foreground"><span className="font-mono uppercase">{example ? "Ejemplo original:" : "Original IA:"}</span> {p.text}</p>
           )}
 
           <div className="mt-4 grid gap-3 xl:grid-cols-2">
             <div className="rounded-lg border-2 border-blue-300 border-l-[5px] border-l-blue-700 bg-blue-50 p-4 text-sm text-black shadow-sm">
-              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-blue-900"><Brain className="h-5 w-5 shrink-0" />Inferencia de la IA</div>
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-blue-900"><Brain className="h-5 w-5 shrink-0" />{example ? "Relación con la capa" : "Inferencia de la IA"}</div>
               <p className="leading-relaxed">{p.rationale}</p>
             </div>
             <div className="rounded-lg border-2 border-green-300 border-l-[5px] border-l-green-700 bg-green-50 p-4 text-sm text-black shadow-sm">
               <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />Qué dice la información guardada</div>
               {p.evidence.length === 0 ? (
-                <p className="text-black" data-testid={`text-no-evidence-${p.id}`}>No se encontró una cita en los documentos leídos que respalde esta propuesta. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en la información guardada.</p>
+                <p className="text-black" data-testid={`text-no-evidence-${p.id}`}>{example ? "Ejemplo educativo predefinido. No se han consultado documentos para este ejemplo; no constituye evidencia documental." : <>No se encontró una cita en los documentos leídos que respalde esta propuesta. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en la información guardada.</>}</p>
               ) : (
                 <ul className="space-y-3">
                   {p.evidence.map((e, i) => (

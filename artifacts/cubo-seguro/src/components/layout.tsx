@@ -5,9 +5,9 @@ import { Boxes, History, LayoutGrid, Menu, ShieldCheck, X, Info } from "lucide-r
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const NAV = [
+  { href: "/modelo", label: "Modelo McCumber", icon: Boxes },
   { href: "/", label: "Resumen", icon: LayoutGrid },
   { href: "/evaluaciones", label: "Evaluaciones", icon: History },
-  { href: "/modelo", label: "Modelo McCumber", icon: Boxes },
 ];
 
 export function CubeMark({ className = "" }: { className?: string }) {

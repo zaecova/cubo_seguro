@@ -2,6 +2,12 @@
 name: Evaluación y fuentes
 description: Requisitos del usuario sobre McCumber, procedencia y aprobación humana.
 ---
+Modelo McCumber debe ir primero en el menú. La selección de principios, estados o contramedidas debe mostrar tres ejemplos relacionados, con validación individual como las propuestas.
+
+**Why:** El usuario pidió reorganizar la navegación y aprender mediante ejemplos que pueda validar.
+
+**How to apply:** Mantener aprobar, editar y rechazar; distinguir ejemplos didácticos predefinidos de generación de IA y evidencia documental.
+
 No mostrar un apartado independiente «Fuentes»; presentar la propuesta de IA junto a lo que dice la información guardada dentro de la evaluación.
 
 **Why:** El usuario solicitó quitar el ítem Fuentes y conservar esos dos contenidos.

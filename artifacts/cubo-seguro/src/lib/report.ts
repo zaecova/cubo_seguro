@@ -12,7 +12,7 @@ export function reportJSON(ev: Evaluation) {
     {
       informe: "Cubo Seguro — solo propuestas aprobadas por una persona",
       evaluacionId: a.id,
-      generadoPorIA: a.createdAt,
+      ...(a.id.startsWith("ejemplos-mccumber-") ? { creado: a.createdAt, origen: "Ejemplo didáctico predefinido" } : { generadoPorIA: a.createdAt }),
       exportado: new Date().toISOString(),
       riesgo: a.input,
       aprobadas: approved(ev).map((p) => {
@@ -22,10 +22,9 @@ export function reportJSON(ev: Evaluation) {
           categoria: p.category,
           textoAprobado: finalText(p, r),
           editadoPorPersona: r?.editedText !== undefined,
-          textoOriginalIA: p.text,
-          razonamientoIA: p.rationale,
+          ...(a.id.startsWith("ejemplos-mccumber-") ? { textoOriginalEjemplo: p.text, explicacion: p.rationale } : { textoOriginalIA: p.text, razonamientoIA: p.rationale }),
           citas: p.evidence.map((e) => ({ fuente: e.sourceName, url: e.url, citaLiteral: e.quote })),
-          baseSinFuente: p.evidence.length === 0 ? "Conocimiento general de IA, sin cita documental" : undefined,
+          baseSinFuente: p.evidence.length === 0 ? (a.id.startsWith("ejemplos-mccumber-") ? "Ejemplo didáctico predefinido, sin consulta documental" : "Conocimiento general de IA, sin cita documental") : undefined,
         };
       }),
     },
@@ -36,6 +35,7 @@ export function reportJSON(ev: Evaluation) {
 
 export function reportText(ev: Evaluation) {
   const a = ev.analysis;
+  const example = a.id.startsWith("ejemplos-mccumber-");
   const L: string[] = [];
   L.push("CUBO SEGURO — INFORME DE PROPUESTAS APROBADAS", "=".repeat(48), "");
   L.push(`Riesgo: ${a.input.title}`, `Amenaza: ${a.input.threat}`, `Vulnerabilidad: ${a.input.vulnerability}`, `Información: ${a.input.information}`, "");
@@ -49,9 +49,9 @@ export function reportText(ev: Evaluation) {
     ps.forEach((p) => {
       const r = ev.reviews[p.id];
       L.push(`- [${p.category}] ${finalText(p, r)}${r?.editedText !== undefined ? "  (editado por persona)" : ""}`);
-      if (r?.editedText !== undefined) L.push(`    Original IA: ${p.text}`);
-      L.push(`    Inferencia IA: ${p.rationale}`);
-      if (p.evidence.length === 0) L.push("    Fuente: ninguna — conocimiento general de IA.");
+      if (r?.editedText !== undefined) L.push(`    ${example ? "Ejemplo original" : "Original IA"}: ${p.text}`);
+      L.push(`    ${example ? "Relación con la capa" : "Inferencia IA"}: ${p.rationale}`);
+      if (p.evidence.length === 0) L.push(example ? "    Fuente: ninguna — ejemplo didáctico predefinido." : "    Fuente: ninguna — conocimiento general de IA.");
       p.evidence.forEach((e) => L.push(`    Cita «${e.quote}» — ${e.sourceName} ${e.url}`));
     });
     L.push("");
