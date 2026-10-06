@@ -2,6 +2,12 @@
 name: Evaluación y fuentes
 description: Requisitos del usuario sobre McCumber, procedencia y aprobación humana.
 ---
+No mostrar un apartado independiente «Fuentes»; presentar la propuesta de IA junto a lo que dice la información guardada dentro de la evaluación.
+
+**Why:** El usuario solicitó quitar el ítem Fuentes y conservar esos dos contenidos.
+
+**How to apply:** No interpretar esta simplificación de navegación como permiso para compartir documentos con todos los usuarios ni como una eliminación de las fuentes del análisis.
+
 El usuario pide analizar amenazas y vulnerabilidades con las tres dimensiones de McCumber: principios de seguridad, estados de información y contramedidas. Debe identificar qué información resulta afectada.
 
 Presentar solamente tres propuestas para decidir: una por cada dimensión del cubo. Integrar la información afectada en la propuesta de estados; agrupar las medidas en una sola propuesta de contramedidas.

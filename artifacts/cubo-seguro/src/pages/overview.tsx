@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useAnalyzeRisk, useGetSources, type RiskInput } from "@workspace/api-client-react";
+import { useAnalyzeRisk, type RiskInput } from "@workspace/api-client-react";
 import { ArrowRight, Loader2, Sparkles, FlaskConical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,13 +31,10 @@ export default function Overview() {
   const [, nav] = useLocation();
   const { toast } = useToast();
   const analyze = useAnalyzeRisk();
-  const sources = useGetSources();
   const { evaluations, error } = useEvaluations();
 
   const valid = form.title.trim().length >= 1 && (["threat", "vulnerability", "information"] as const).every((k) => form[k].trim().length >= 3);
   const pendingTotal = evaluations.reduce((n, e) => n + counts(e).pending, 0);
-  const read = sources.data?.sources.filter((s) => s.status === "read").length ?? 0;
-  const total = sources.data?.sources.length ?? 0;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +62,7 @@ export default function Overview() {
         <LocalNotice error={error} />
       </PageHead>
 
-      <div className="grid gap-4 sm:grid-cols-3 rise" style={{ animationDelay: "80ms" }}>
+      <div className="grid gap-4 sm:grid-cols-2 rise" style={{ animationDelay: "80ms" }}>
         <Link href="/evaluaciones" className="rounded-lg border border-card-border bg-card p-5 transition-transform hover:-translate-y-0.5" data-testid="link-stat-evaluations">
           <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Evaluaciones locales</div>
           <div className="font-display mt-2 text-4xl" data-testid="text-eval-count">{evaluations.length}</div>
@@ -73,10 +70,6 @@ export default function Overview() {
         <Link href="/evaluaciones" className="rounded-lg border border-accent/60 bg-accent/15 p-5 transition-transform hover:-translate-y-0.5" data-testid="link-stat-pending">
           <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Propuestas sin decidir</div>
           <div className="font-display mt-2 text-4xl" data-testid="text-pending-count">{pendingTotal}</div>
-        </Link>
-        <Link href="/fuentes" className="rounded-lg border border-card-border bg-card p-5 transition-transform hover:-translate-y-0.5" data-testid="link-stat-sources">
-          <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Fuentes leídas</div>
-          <div className="font-display mt-2 text-4xl">{sources.isLoading ? "…" : sources.isError ? "—" : `${read}/${total}`}</div>
         </Link>
       </div>
 

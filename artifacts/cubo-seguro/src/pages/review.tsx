@@ -155,9 +155,9 @@ function ProposalCard({ p, ev, onChange }: { p: Proposal; ev: Evaluation; onChan
               <p className="leading-relaxed">{p.rationale}</p>
             </div>
             <div className="rounded-lg border-2 border-green-300 border-l-[5px] border-l-green-700 bg-green-50 p-4 text-sm text-black shadow-sm">
-              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />Evidencia documental</div>
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />Qué dice la información guardada</div>
               {p.evidence.length === 0 ? (
-                <p className="text-black" data-testid={`text-no-evidence-${p.id}`}>Sin cita de Drive. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en tus documentos.</p>
+                <p className="text-black" data-testid={`text-no-evidence-${p.id}`}>No se encontró una cita en los documentos leídos que respalde esta propuesta. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en la información guardada.</p>
               ) : (
                 <ul className="space-y-3">
                   {p.evidence.map((e, i) => (

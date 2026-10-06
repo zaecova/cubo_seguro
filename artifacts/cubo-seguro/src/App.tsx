@@ -8,10 +8,10 @@ import { Layout } from '@/components/layout';
 import Overview from '@/pages/overview';
 import Evaluaciones from '@/pages/evaluaciones';
 import Review from '@/pages/review';
-import Fuentes from '@/pages/fuentes';
 import Modelo from '@/pages/modelo';
 import {
   Route,
+  Redirect,
   Switch,
   useLocation,
   Router as WouterRouter,
@@ -28,7 +28,7 @@ function Router() {
         <Route path="/" component={Overview} />
         <Route path="/evaluaciones" component={Evaluaciones} />
         <Route path="/evaluaciones/:id" component={Review} />
-        <Route path="/fuentes" component={Fuentes} />
+        <Route path="/fuentes"><Redirect to="/" /></Route>
         <Route path="/modelo" component={Modelo} />
         <Route component={NotFound} />
       </Switch>
