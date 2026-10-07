@@ -14,6 +14,12 @@ Modelo McCumber debe ir primero en el menú. La selección de principios, estado
 
 **How to apply:** Mantener aprobar, editar y rechazar; distinguir ejemplos didácticos predefinidos de generación de IA y evidencia documental.
 
+En los tres ejemplos, mostrar solo dos cuadros de contenido: «Ejemplo didáctico» y «Qué dice la fuente», sin un cuadro adicional de relación con la capa.
+
+**Why:** El usuario pidió simplificar el contenido de cada ejemplo a esos dos cuadros.
+
+**How to apply:** Conservar la fuente y su enlace separados del texto didáctico, sin duplicar el ejemplo fuera de su cuadro.
+
 No mostrar un apartado independiente «Fuentes»; presentar la propuesta de IA junto a lo que dice la información guardada dentro de la evaluación.
 
 **Why:** El usuario solicitó quitar el ítem Fuentes y conservar esos dos contenidos.

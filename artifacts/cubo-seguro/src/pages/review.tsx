@@ -110,6 +110,26 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
     setEditing(false);
   };
 
+  const proposalText = (
+    <>
+      {editing ? (
+        <div className="mt-3 space-y-2">
+          <Textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} aria-label="Editar texto" data-testid={`input-edit-${p.id}`} />
+          <p className="text-xs text-muted-foreground">Guardar una edición devuelve la propuesta a pendiente; tendrás que aprobarla de nuevo.</p>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" onClick={saveEdit} disabled={!draft.trim()} data-testid={`button-save-edit-${p.id}`}>Guardar edición</Button>
+            <Button size="sm" variant="ghost" onClick={() => { setDraft(finalText(p, r)); setEditing(false); }}>Cancelar</Button>
+          </div>
+        </div>
+      ) : (
+        <label htmlFor={`ap-${p.id}`} className={`mt-2 block cursor-pointer text-[15px] leading-relaxed ${r.status === "rejected" ? "line-through" : ""}`}>{finalText(p, r)}</label>
+      )}
+      {edited && !editing && (
+        <p className="mt-2 border-l-2 border-border pl-3 text-xs text-muted-foreground"><span className="font-mono uppercase">{example ? "Ejemplo original:" : "Original IA:"}</span> {p.text}</p>
+      )}
+    </>
+  );
+
   return (
     <article className={`relative rounded-xl border p-5 transition-colors ${tone}`} data-testid={`card-proposal-${p.id}`}>
       {r.status !== "pending" && (
@@ -133,29 +153,15 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
             <span className="text-muted-foreground">{example ? "Ejemplo didáctico" : "Propuesta IA"}</span>
             {edited && <span className="rounded bg-accent px-1.5 py-0.5 text-accent-foreground" data-testid={`text-edited-${p.id}`}>Editada por persona</span>}
           </div>
-          {editing ? (
-            <div className="mt-3 space-y-2">
-              <Textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} aria-label="Editar texto" data-testid={`input-edit-${p.id}`} />
-              <p className="text-xs text-muted-foreground">Guardar una edición devuelve la propuesta a pendiente; tendrás que aprobarla de nuevo.</p>
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" onClick={saveEdit} disabled={!draft.trim()} data-testid={`button-save-edit-${p.id}`}>Guardar edición</Button>
-                <Button size="sm" variant="ghost" onClick={() => { setDraft(finalText(p, r)); setEditing(false); }}>Cancelar</Button>
-              </div>
-            </div>
-          ) : (
-            <label htmlFor={`ap-${p.id}`} className={`mt-2 block cursor-pointer text-[15px] leading-relaxed ${r.status === "rejected" ? "line-through" : ""}`}>{finalText(p, r)}</label>
-          )}
-          {edited && !editing && (
-            <p className="mt-2 border-l-2 border-border pl-3 text-xs text-muted-foreground"><span className="font-mono uppercase">{example ? "Ejemplo original:" : "Original IA:"}</span> {p.text}</p>
-          )}
+          {!example && proposalText}
 
           <div className="mt-4 grid gap-3 xl:grid-cols-2">
             <div className="rounded-lg border-2 border-blue-300 border-l-[5px] border-l-blue-700 bg-blue-50 p-4 text-sm text-black shadow-sm">
-              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-blue-900"><Brain className="h-5 w-5 shrink-0" />{example ? "Relación con la capa" : "Inferencia de la IA"}</div>
-              <p className="leading-relaxed">{p.rationale}</p>
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-blue-900"><Brain className="h-5 w-5 shrink-0" />{example ? "Ejemplo didáctico" : "Inferencia de la IA"}</div>
+              {example ? proposalText : <p className="leading-relaxed">{p.rationale}</p>}
             </div>
             <div className="rounded-lg border-2 border-green-300 border-l-[5px] border-l-green-700 bg-green-50 p-4 text-sm text-black shadow-sm">
-              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />Qué dicen las fuentes</div>
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />{example ? "Qué dice la fuente" : "Qué dicen las fuentes"}</div>
               {example && p.evidence.length > 0 && <p className="mb-3 text-xs">Apoyo conceptual externo. La cita no describe este caso ni prescribe necesariamente la medida concreta del ejemplo.</p>}
               {p.evidence.length === 0 ? (
                 <p className="text-black" data-testid={`text-no-evidence-${p.id}`}>{example ? "Ejemplo educativo predefinido. No se han consultado documentos para este ejemplo; no constituye evidencia documental." : <>No se encontró una cita en los documentos leídos que respalde esta propuesta. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en la información guardada.</>}</p>
