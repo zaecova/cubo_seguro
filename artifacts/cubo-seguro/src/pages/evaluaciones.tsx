@@ -9,8 +9,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { PageHead, LocalNotice, CubeMark } from "@/components/layout";
 import { counts, useEvaluations } from "@/lib/store";
+import { useI18n } from "@/lib/i18n";
 
 export default function Evaluaciones() {
+  const { view, locale } = useI18n();
   const { evaluations, error, remove } = useEvaluations();
   const [q, setQ] = useState("");
   const [del, setDel] = useState<string | null>(null);
@@ -29,7 +31,7 @@ export default function Evaluaciones() {
     setDel(null);
   };
 
-  return (
+  return view(
     <div className="mx-auto max-w-5xl px-5 py-8 md:px-10 md:py-12">
       <PageHead kicker="Historial local" title="Evaluaciones">
         <LocalNotice error={error} />
@@ -59,10 +61,10 @@ export default function Evaluaciones() {
             return (
               <li key={e.analysis.id} className="rise group flex items-center gap-4 p-4 md:p-5" style={{ animationDelay: `${i * 30}ms` }} data-testid={`row-eval-${e.analysis.id}`}>
                 <Link href={`/evaluaciones/${e.analysis.id}`} className="min-w-0 flex-1" data-testid={`link-eval-${e.analysis.id}`}>
-                  <div className="truncate font-medium group-hover:text-primary">{e.analysis.input.title}</div>
-                  <div className="mt-1 truncate text-sm text-muted-foreground">{e.analysis.input.threat}</div>
+                  <div translate="no" className="truncate font-medium group-hover:text-primary">{e.analysis.input.title}</div>
+                  <div translate="no" className="mt-1 truncate text-sm text-muted-foreground">{e.analysis.input.threat}</div>
                   <div className="mt-2 flex flex-wrap gap-3 font-mono text-[11px] text-muted-foreground">
-                    <span>{new Date(e.analysis.createdAt).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" })}</span>
+                    <span>{new Date(e.analysis.createdAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })}</span>
                     <span className="text-primary">{c.approved} aprobadas</span>
                     <span>{c.pending} pendientes</span>
                     <span className="text-destructive">{c.rejected} rechazadas</span>

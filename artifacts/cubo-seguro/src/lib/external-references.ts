@@ -1,5 +1,12 @@
 import catalog from "../../../api-server/src/lib/trusted-references.json";
 import type { Axis } from "./mccumber";
+import { SOURCE_ES } from "./source-translations";
+
+export function getReferenceTranslation(e: { sourceId: string; quote: string }) {
+  const source = catalog.find(s => s.id === e.sourceId);
+  // Never attach a translation to a quote that is not in the verified excerpt.
+  return source && e.quote.trim().length >= 15 && source.text.includes(e.quote) ? SOURCE_ES[e.sourceId] : undefined;
+}
 
 // These are conceptual references, not claims that NIST authored the examples.
 const MATCHES: Record<Axis, string[][]> = {

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { PageHead, LocalNotice, CubeMark } from "@/components/layout";
 import { counts, newEvaluation, saveEvaluation, useEvaluations } from "@/lib/store";
+import { useI18n } from "@/lib/i18n";
 
 const EMPTY: RiskInput = { title: "", threat: "", vulnerability: "", information: "" };
 const EXAMPLE: RiskInput = {
@@ -26,11 +27,12 @@ const FIELDS: { k: keyof RiskInput; label: string; hint: string; area?: boolean;
 ];
 
 export default function Overview() {
+  const { view, t, language } = useI18n();
   const [form, setForm] = useState<RiskInput>(EMPTY);
   const [isExample, setIsExample] = useState(false);
   const [, nav] = useLocation();
   const { toast } = useToast();
-  const analyze = useAnalyzeRisk();
+  const analyze = useAnalyzeRisk({ request: { headers: { "Accept-Language": language } } });
   const { evaluations, error } = useEvaluations();
 
   const valid = form.title.trim().length >= 1 && (["threat", "vulnerability", "information"] as const).every((k) => form[k].trim().length >= 3);
@@ -45,7 +47,7 @@ export default function Overview() {
         onSuccess: (analysis) => {
           const err = saveEvaluation(newEvaluation(analysis));
           if (err) {
-            toast({ title: "No se pudo guardar localmente", description: err + " La evaluación no persistirá.", variant: "destructive" });
+            toast({ title: t("No se pudo guardar localmente"), description: t(err) + " " + t("La evaluación no persistirá."), variant: "destructive" });
             return;
           }
           toast({ title: "Propuestas generadas", description: "Todas quedan pendientes de tu revisión." });
@@ -56,7 +58,7 @@ export default function Overview() {
     );
   };
 
-  return (
+  return view(
     <div className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">
       <PageHead kicker="Espacio de trabajo" title={<>La IA propone.<br /><em className="text-primary">Tú firmas.</em></>}>
         <LocalNotice error={error} />
@@ -77,7 +79,7 @@ export default function Overview() {
         <form onSubmit={submit} className="rise rounded-xl border border-card-border bg-card p-6 md:p-8" style={{ animationDelay: "140ms" }} aria-busy={analyze.isPending}>
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-display text-2xl">Nuevo riesgo</h2>
-            <Button type="button" variant="outline" size="sm" onClick={() => { setForm(EXAMPLE); setIsExample(true); }} data-testid="button-fill-example">
+            <Button type="button" variant="outline" size="sm" onClick={() => { setForm({ title: t(EXAMPLE.title), threat: t(EXAMPLE.threat), vulnerability: t(EXAMPLE.vulnerability), information: t(EXAMPLE.information) }); setIsExample(true); }} data-testid="button-fill-example">
               <FlaskConical className="h-4 w-4" /> Rellenar con ejemplo
             </Button>
           </div>
@@ -123,7 +125,7 @@ export default function Overview() {
               ["04", "Aprueba", "Nada cuenta hasta que tú lo marcas. Solo lo aprobado se exporta."],
             ].map(([n, t, d]) => (
               <li key={n} className="flex gap-3">
-                <span className="font-mono text-xs text-primary">{n}</span>
+                <span className="shrink-0 font-mono text-xs text-primary">{n}</span>
                 <div><div className="font-medium">{t}</div><div className="text-muted-foreground">{d}</div></div>
               </li>
             ))}

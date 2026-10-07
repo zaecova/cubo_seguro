@@ -20,6 +20,12 @@ En los tres ejemplos, mostrar solo dos cuadros de contenido: «Ejemplo didáctic
 
 **How to apply:** Conservar la fuente y su enlace separados del texto didáctico, sin duplicar el ejemplo fuera de su cuadro.
 
+El usuario eligió un selector Español / English para toda la aplicación, no solo para las citas.
+
+**Why:** Quiere que la información coincida con el idioma seleccionado.
+
+**How to apply:** Localizar interfaz, ejemplos y nuevos análisis. Mantener intactos textos introducidos y decisiones históricas; las versiones idiomáticas de los ejemplos requieren aprobaciones independientes. Las traducciones de fuentes deben identificarse como no oficiales y permitir consultar y exportar la cita original.
+
 No mostrar un apartado independiente «Fuentes»; presentar la propuesta de IA junto a lo que dice la información guardada dentro de la evaluación.
 
 **Why:** El usuario solicitó quitar el ítem Fuentes y conservar esos dos contenidos.

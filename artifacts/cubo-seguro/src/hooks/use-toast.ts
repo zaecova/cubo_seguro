@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useI18n } from '@/lib/i18n';
 import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
 
 const TOAST_LIMIT = 1;
@@ -165,6 +166,7 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
+  const { view } = useI18n();
   const [state, setState] = React.useState<State>(memoryState);
 
   React.useEffect(() => {
@@ -179,6 +181,7 @@ function useToast() {
 
   return {
     ...state,
+    toasts: state.toasts.map(item => ({ ...item, title: view(item.title), description: view(item.description) })),
     toast,
     dismiss: (toastId?: string) => dispatch({ type: 'DISMISS_TOAST', toastId }),
   };

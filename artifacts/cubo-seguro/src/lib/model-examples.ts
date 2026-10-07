@@ -1,6 +1,10 @@
 import { AXES, type Axis } from "./mccumber";
 import { newEvaluation } from "./store";
 import { exampleReference } from "./external-references";
+import { translate, type Language } from "./i18n";
+import { EXAMPLE_EN } from "./translations";
+
+export const EXAMPLE_WARNING = "Ejemplos didácticos predefinidos con referencias oficiales externas de apoyo conceptual. No son ejemplos escritos por NIST o CISA ni resultados de una consulta a Drive o generación de IA en tiempo real.";
 
 const EXAMPLES: Record<Axis, string[][]> = {
   principle: [
@@ -56,25 +60,27 @@ const EXAMPLES: Record<Axis, string[][]> = {
   ],
 };
 
-export function exampleEvaluation(axis: Axis, index: number) {
+export function exampleEvaluation(axis: Axis, index: number, language: Language = "es") {
+  const t = (text: string) => translate(text, language);
   const layer = AXES[axis].items[index];
-  const id = `ejemplos-mccumber-${axis}-${layer.key}`;
+  // Keep legacy Spanish IDs; reviews in different languages are separate decisions.
+  const id = `ejemplos-mccumber-${axis}-${layer.key}${language === "en" ? "-en" : ""}`;
   return newEvaluation({
     id,
     createdAt: new Date().toISOString(),
     input: {
-      title: `Ejemplos: ${AXES[axis].label} · ${layer.label}`,
-      threat: "Situaciones ficticias de aprendizaje; no es un análisis de riesgo real.",
-      vulnerability: `Ejemplos centrados en ${layer.label.toLowerCase()}.`,
-      information: "La información afectada se describe en cada ejemplo.",
+      title: `${language === "es" ? "Ejemplos" : "Examples"}: ${t(AXES[axis].label)} · ${t(layer.label)}`,
+      threat: t("Situaciones ficticias de aprendizaje; no es un análisis de riesgo real."),
+      vulnerability: language === "es" ? `Ejemplos centrados en ${layer.label.toLowerCase()}.` : `Examples focused on ${t(layer.label).toLowerCase()}.`,
+      information: t("La información afectada se describe en cada ejemplo."),
     },
-    warning: "Ejemplos didácticos predefinidos con referencias oficiales externas de apoyo conceptual. No son ejemplos escritos por NIST o CISA ni resultados de una consulta a Drive o generación de IA en tiempo real.",
+    warning: t(EXAMPLE_WARNING),
     proposals: EXAMPLES[axis][index].map((text, i) => ({
       id: `${id}-${i + 1}`,
       dimension: axis,
-      category: `${layer.label} · Ejemplo ${i + 1}`,
-      text,
-      rationale: `${AXES[axis].label}: ${layer.label}. ${layer.desc}`,
+      category: `${t(layer.label)} · ${language === "es" ? "Ejemplo" : "Example"} ${i + 1}`,
+      text: language === "es" ? text : EXAMPLE_EN[text],
+      rationale: `${t(AXES[axis].label)}: ${t(layer.label)}. ${t(layer.desc)}`,
       evidence: [exampleReference(axis, index, i)],
     })),
   });

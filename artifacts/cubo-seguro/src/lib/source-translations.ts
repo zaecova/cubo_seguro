@@ -1,0 +1,16 @@
+export const SOURCE_ES: Record<string, string> = {
+  "external:nist-csf2:PR.AA-05": "Los permisos, derechos y autorizaciones de acceso se definen en una política, se gestionan, se aplican y se revisan, e incorporan los principios de mínimo privilegio y separación de funciones.",
+  "external:nist-csf2:PR.DS-01": "Se protegen la confidencialidad, la integridad y la disponibilidad de los datos en reposo.",
+  "external:nist-csf2:PR.DS-02": "Se protegen la confidencialidad, la integridad y la disponibilidad de los datos en tránsito.",
+  "external:nist-csf2:PR.DS-10": "Se protegen la confidencialidad, la integridad y la disponibilidad de los datos en uso.",
+  "external:nist-csf2:PR.DS-11": "Se crean, protegen, mantienen y prueban copias de seguridad de los datos.",
+  "external:nist-csf2:PR.PS-04": "Se generan registros de eventos y se ponen a disposición para su supervisión continua.",
+  "external:nist-csf2:ID.RA-09": "Se evalúan la autenticidad y la integridad del hardware y del software antes de su adquisición y uso.",
+  "external:nist-csf2:PR.IR-03": "Se implementan mecanismos para cumplir los requisitos de resiliencia en situaciones normales y adversas.",
+  "external:nist-csf2:PR.IR-04": "Se mantiene una capacidad de recursos adecuada para garantizar la disponibilidad.",
+  "external:nist-csf2:PR.IR-01": "Se protegen las redes y los entornos frente al acceso y uso lógico no autorizados.",
+  "external:nist-csf2:GV.PO-01": "La política de gestión de riesgos de ciberseguridad se establece a partir del contexto de la organización, su estrategia y sus prioridades de ciberseguridad, y se comunica y se aplica.",
+  "external:nist-csf2:ID.IM-04": "Se establecen, comunican, mantienen y mejoran los planes de respuesta a incidentes y otros planes de ciberseguridad que afectan a las operaciones.",
+  "external:nist-csf2:PR.AT-01": "Se proporciona al personal concienciación y formación para que disponga de los conocimientos y las habilidades necesarios para realizar tareas generales teniendo en cuenta los riesgos de ciberseguridad.",
+  "external:cisa:mfa": "La autenticación multifactor (MFA) es un enfoque de varias capas para proteger las cuentas en línea.",
+};

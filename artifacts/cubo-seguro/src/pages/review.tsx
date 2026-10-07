@@ -10,15 +10,19 @@ import { PageHead, LocalNotice } from "@/components/layout";
 import { counts, finalText, useEvaluations, type Evaluation, type ProposalReview } from "@/lib/store";
 import { DIMENSION_LABEL, DIMENSION_ORDER } from "@/lib/mccumber";
 import { download, reportJSON, reportText } from "@/lib/report";
+import { useI18n } from "@/lib/i18n";
+import { SourceQuote } from "@/components/source-quote";
+import { EXAMPLE_WARNING } from "@/lib/model-examples";
 
 export default function Review() {
+  const { view, locale, t, language } = useI18n();
   const { id } = useParams<{ id: string }>();
   const { evaluations, error, update } = useEvaluations();
   const { toast } = useToast();
   const ev = evaluations.find((e) => e.analysis.id === id);
 
   if (!ev) {
-    return (
+    return view(
       <div className="mx-auto max-w-xl px-5 py-24 text-center">
         <h1 className="font-display text-3xl">Evaluación no encontrada</h1>
         <p className="mt-2 text-sm text-muted-foreground">{error ?? "No existe en el almacenamiento de este navegador. Puede haberse eliminado o creado en otro dispositivo."}</p>
@@ -36,13 +40,13 @@ export default function Review() {
   const a = ev.analysis;
   const slug = a.input.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
 
-  return (
+  return view(
     <div className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">
       <Link href="/evaluaciones" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back"><ArrowLeft className="h-4 w-4" />Evaluaciones</Link>
-      <PageHead kicker={`Revisión · ${new Date(a.createdAt).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" })}`} title={a.input.title}>
+      <PageHead kicker={`${t("Revisión")} · ${new Date(a.createdAt).toLocaleString(locale, { dateStyle: "long", timeStyle: "short" })}`} title={<span translate="no">{a.input.title}</span>}>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" disabled={!c.approved} onClick={() => download(`cubo-seguro-${slug}.txt`, reportText(ev), "text/plain;charset=utf-8")} data-testid="button-export-text"><Download className="h-4 w-4" />Texto</Button>
-          <Button variant="outline" disabled={!c.approved} onClick={() => download(`cubo-seguro-${slug}.json`, reportJSON(ev), "application/json")} data-testid="button-export-json"><Download className="h-4 w-4" />JSON</Button>
+          <Button variant="outline" disabled={!c.approved} onClick={() => download(`cubo-seguro-${slug}.txt`, reportText(ev, language), "text/plain;charset=utf-8")} data-testid="button-export-text"><Download className="h-4 w-4" />Texto</Button>
+          <Button variant="outline" disabled={!c.approved} onClick={() => download(`cubo-seguro-${slug}.json`, reportJSON(ev, language), "application/json")} data-testid="button-export-json"><Download className="h-4 w-4" />JSON</Button>
         </div>
       </PageHead>
 
@@ -52,7 +56,7 @@ export default function Review() {
             {(["threat", "vulnerability", "information"] as const).map((k) => (
               <div key={k} className="mb-4 last:mb-0">
                 <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{k === "threat" ? "Amenaza" : k === "vulnerability" ? "Vulnerabilidad" : "Información afectada"}</div>
-                <p className="mt-1 leading-relaxed">{a.input[k]}</p>
+                <p translate="no" className="mt-1 leading-relaxed">{a.input[k]}</p>
               </div>
             ))}
           </div>
@@ -66,7 +70,7 @@ export default function Review() {
             <p className="mt-4 text-xs text-sidebar-foreground/70">La exportación incluye solo las aprobadas. Pendientes y rechazadas nunca aparecen como aprobadas.</p>
           </div>
           {a.warning && (
-            <div className="flex gap-2 rounded-md border border-accent bg-accent/10 p-3 text-xs" data-testid="text-analysis-warning"><AlertTriangle className="h-4 w-4 shrink-0" />{a.warning}</div>
+              <div translate="no" className="flex gap-2 rounded-md border border-accent bg-accent/10 p-3 text-xs" data-testid="text-analysis-warning"><AlertTriangle className="h-4 w-4 shrink-0" />{a.id.startsWith("ejemplos-mccumber-") ? t(EXAMPLE_WARNING) : a.warning}</div>
           )}
           <LocalNotice error={error} />
         </aside>
@@ -97,6 +101,7 @@ export default function Review() {
 }
 
 export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal; ev: Evaluation; onChange: (r: ProposalReview) => void; example?: boolean }) {
+  const { view } = useI18n();
   const r = ev.reviews[p.id] ?? { status: "pending" };
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(finalText(p, r));
@@ -122,15 +127,15 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
           </div>
         </div>
       ) : (
-        <label htmlFor={`ap-${p.id}`} className={`mt-2 block cursor-pointer text-[15px] leading-relaxed ${r.status === "rejected" ? "line-through" : ""}`}>{finalText(p, r)}</label>
+        <label translate="no" htmlFor={`ap-${p.id}`} className={`mt-2 block cursor-pointer text-[15px] leading-relaxed ${r.status === "rejected" ? "line-through" : ""}`}>{finalText(p, r)}</label>
       )}
       {edited && !editing && (
-        <p className="mt-2 border-l-2 border-border pl-3 text-xs text-muted-foreground"><span className="font-mono uppercase">{example ? "Ejemplo original:" : "Original IA:"}</span> {p.text}</p>
+        <p className="mt-2 border-l-2 border-border pl-3 text-xs text-muted-foreground"><span className="font-mono uppercase">{example ? "Ejemplo original:" : "Original IA:"}</span> <span translate="no">{p.text}</span></p>
       )}
     </>
   );
 
-  return (
+  return view(
     <article className={`relative rounded-xl border p-5 transition-colors ${tone}`} data-testid={`card-proposal-${p.id}`}>
       {r.status !== "pending" && (
         <span className={`pop stamp mb-3 inline-block rounded px-2 py-0.5 font-mono text-[10px] uppercase ${r.status === "approved" ? "text-primary" : "text-destructive"}`} data-testid={`status-proposal-${p.id}`}>
@@ -158,7 +163,7 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
           <div className="mt-4 grid gap-3 xl:grid-cols-2">
             <div className="rounded-lg border-2 border-blue-300 border-l-[5px] border-l-blue-700 bg-blue-50 p-4 text-sm text-black shadow-sm">
               <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-blue-900"><Brain className="h-5 w-5 shrink-0" />{example ? "Ejemplo didáctico" : "Inferencia de la IA"}</div>
-              {example ? proposalText : <p className="leading-relaxed">{p.rationale}</p>}
+              {example ? proposalText : <p translate="no" className="leading-relaxed">{p.rationale}</p>}
             </div>
             <div className="rounded-lg border-2 border-green-300 border-l-[5px] border-l-green-700 bg-green-50 p-4 text-sm text-black shadow-sm">
               <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />{example ? "Qué dice la fuente" : "Qué dicen las fuentes"}</div>
@@ -169,11 +174,7 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
                 <ul className="space-y-3">
                   {p.evidence.map((e, i) => (
                     <li key={i}>
-                      <div className="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wide">
-                        {e.sourceId.startsWith("external:") ? "Referencia oficial externa · cita original en inglés" : "Documento de tu carpeta · Google Drive"}
-                      </div>
-                      <blockquote className="font-serif italic leading-relaxed">«{e.quote}»</blockquote>
-                      <a href={e.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline">{e.sourceName}<ExternalLink className="h-3 w-3" /></a>
+                      <SourceQuote evidence={e} />
                     </li>
                   ))}
                 </ul>

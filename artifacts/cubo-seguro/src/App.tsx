@@ -9,6 +9,7 @@ import Overview from '@/pages/overview';
 import Evaluaciones from '@/pages/evaluaciones';
 import Review from '@/pages/review';
 import Modelo from '@/pages/modelo';
+import { LanguageProvider } from '@/lib/i18n';
 import {
   Route,
   Redirect,
@@ -43,7 +44,7 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <LanguageProvider><QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
           <Layout>
@@ -52,7 +53,7 @@ function App() {
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
-    </QueryClientProvider>
+    </QueryClientProvider></LanguageProvider>
   );
 }
 

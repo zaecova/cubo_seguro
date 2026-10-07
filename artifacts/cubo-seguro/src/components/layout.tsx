@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useHealthCheck } from "@workspace/api-client-react";
 import { Boxes, History, LayoutGrid, Menu, ShieldCheck, X, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { LanguageSelector, useI18n } from "@/lib/i18n";
 
 const NAV = [
   { href: "/modelo", label: "Modelo McCumber", icon: Boxes },
@@ -21,6 +22,7 @@ export function CubeMark({ className = "" }: { className?: string }) {
 }
 
 export function Layout({ children }: { children: ReactNode }) {
+  const { view } = useI18n();
   const [loc] = useLocation();
   const [open, setOpen] = useState(false);
   const [help, setHelp] = useState(false);
@@ -61,6 +63,7 @@ export function Layout({ children }: { children: ReactNode }) {
       </Link>
       {nav}
       <div className="mt-auto space-y-3">
+        <LanguageSelector />
         <button
           onClick={() => setHelp(true)}
           data-testid="button-help"
@@ -76,7 +79,7 @@ export function Layout({ children }: { children: ReactNode }) {
     </div>
   );
 
-  return (
+  return view(
     <div className="min-h-[100dvh] md:grid md:grid-cols-[248px_1fr]">
       <aside className="hidden bg-sidebar md:block md:sticky md:top-0 md:h-[100dvh]">{side}</aside>
       <header className="flex items-center justify-between bg-sidebar px-4 py-3 text-sidebar-foreground md:hidden">
@@ -105,7 +108,8 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export function PageHead({ kicker, title, children }: { kicker: string; title: ReactNode; children?: ReactNode }) {
-  return (
+  const { view } = useI18n();
+  return view(
     <div className="rise mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
       <div>
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">{kicker}</div>
@@ -117,9 +121,10 @@ export function PageHead({ kicker, title, children }: { kicker: string; title: R
 }
 
 export function LocalNotice({ error }: { error?: string | null }) {
-  return (
+  const { view } = useI18n();
+  return view(
     <div role="status" data-testid="text-local-notice" className={`flex items-start gap-2 rounded-md border px-3 py-2 text-xs ${error ? "border-destructive/40 bg-destructive/5 text-destructive" : "border-border bg-muted/50 text-muted-foreground"}`}>
-      <span className="font-mono uppercase tracking-wider">{error ? "Error" : "Local"}</span>
+      <span className="shrink-0 font-mono uppercase tracking-wider">{error ? "Error" : "Local"}</span>
       <span>{error ?? "Historial guardado en este navegador. Al analizar, el escenario y las fuentes se procesan con IA."}</span>
     </div>
   );

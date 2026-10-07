@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { PageHead } from "@/components/layout";
 import { AXES, type Axis } from "@/lib/mccumber";
 import { ModelExamples } from "@/components/model-examples";
+import { useI18n } from "@/lib/i18n";
 
 type Sel = Record<Axis, number>;
 const AX: Axis[] = ["principle", "state", "countermeasure"];
 
 export default function Modelo() {
+  const { view } = useI18n();
   const [sel, setSel] = useState<Sel>({ principle: 0, state: 0, countermeasure: 0 });
   const [rot, setRot] = useState({ x: -24, y: 36 });
   const [activeAxis, setActiveAxis] = useState<Axis>("principle");
@@ -19,7 +21,7 @@ export default function Modelo() {
   const n = sel.principle * 9 + sel.state * 3 + sel.countermeasure + 1;
   const S = 64;
 
-  return (
+  return view(
     <div className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">
       <PageHead kicker="Marco conceptual" title={<>El cubo de <em className="text-primary">McCumber</em></>}>
         <p className="max-w-sm text-sm text-muted-foreground">Selecciona una dimensión y una capa. Después pulsa «Mostrar tres tarjetas» para revisar los ejemplos.</p>
