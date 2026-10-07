@@ -166,13 +166,13 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
               {example ? proposalText : <p translate="no" className="leading-relaxed">{p.rationale}</p>}
             </div>
             <div className="rounded-lg border-2 border-green-300 border-l-[5px] border-l-green-700 bg-green-50 p-4 text-sm text-black shadow-sm">
-              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />{example ? "Qué dice la fuente" : "Qué dicen las fuentes"}</div>
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />Qué dice la fuente</div>
               {example && p.evidence.length > 0 && <p className="mb-3 text-xs">Apoyo conceptual externo. La cita no describe este caso ni prescribe necesariamente la medida concreta del ejemplo.</p>}
               {p.evidence.length === 0 ? (
                 <p className="text-black" data-testid={`text-no-evidence-${p.id}`}>{example ? "Ejemplo educativo predefinido. No se han consultado documentos para este ejemplo; no constituye evidencia documental." : <>No se encontró una cita en los documentos leídos que respalde esta propuesta. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en la información guardada.</>}</p>
               ) : (
                 <ul className="space-y-3">
-                  {p.evidence.map((e, i) => (
+                  {p.evidence.slice(0, 1).map((e, i) => (
                     <li key={i}>
                       <SourceQuote evidence={e} />
                     </li>

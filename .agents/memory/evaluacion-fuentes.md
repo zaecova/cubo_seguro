@@ -20,6 +20,12 @@ En los tres ejemplos, mostrar solo dos cuadros de contenido: «Ejemplo didáctic
 
 **How to apply:** Conservar la fuente y su enlace separados del texto didáctico, sin duplicar el ejemplo fuera de su cuadro.
 
+Mostrar una sola referencia por tarjeta.
+
+**Why:** El usuario pidió «tambien muestra una sola referencia».
+
+**How to apply:** En nuevos análisis seleccionar como máximo una referencia pertinente; no inventarla si falta respaldo. Limitar la presentación de registros antiguos sin borrar sus evidencias guardadas.
+
 El usuario eligió un selector Español / English para toda la aplicación, no solo para las citas.
 
 **Why:** Quiere que la información coincida con el idioma seleccionado.
