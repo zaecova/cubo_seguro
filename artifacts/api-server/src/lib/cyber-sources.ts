@@ -1,7 +1,7 @@
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import { GetSourcesResponse } from "@workspace/api-zod";
 import type { z } from "zod";
-import { extractPdfText, readPdfDownload, MAX_PDF_BYTES } from "./pdf-text";
+import { downloadDrivePdf, MAX_PDF_BYTES, PDF_SIZE_ERROR } from "./pdf-text";
 
 type Inventory = z.infer<typeof GetSourcesResponse>;
 const rootFolder = { id: "1rXkfXrQTjHm-u8f9ilHTVV6nZlo5VchJ", name: "Gestión de ciberseguridad" };
@@ -52,16 +52,15 @@ async function load(): Promise<Inventory> {
         if (file.mimeType === "application/pdf") {
           pdfJobs.push(async () => {
             try {
-              if (Number(file.size) > MAX_PDF_BYTES) throw new Error("PDF mayor de 20 MB; no se ha procesado.");
-              const downloaded = await connector.proxy("google-drive", `/drive/v3/files/${encodeURIComponent(file.id)}?alt=media`, { method: "GET" });
-              const extracted = await extractPdfText(await readPdfDownload(downloaded));
+              if (Number(file.size) > MAX_PDF_BYTES) throw new Error(PDF_SIZE_ERROR);
+              const extracted = await downloadDrivePdf(file.id);
               source.text = extracted.text;
               source.note = extracted.note;
-              source.status = "read";
+              source.status = extracted.partial ? "partial" : "read";
             } catch (error) {
               source.status = "error";
               source.text = "";
-              source.note = error instanceof Error && /PDF mayor|sin texto extraíble/.test(error.message)
+              source.note = error instanceof Error && /PDF mayor|sin texto extraíble|^PDF:/.test(error.message)
                 ? error.message
                 : "No se pudo extraer el PDF: puede estar protegido, dañado o no disponible. No se utiliza como evidencia; vuelve a sincronizar.";
             }
@@ -89,15 +88,16 @@ async function load(): Promise<Inventory> {
   }
   // Bound parallel downloads and parsing to avoid exhausting memory.
   let nextJob = 0;
-  await Promise.all(Array.from({ length: Math.min(3, pdfJobs.length) }, async () => {
+  await Promise.all(Array.from({ length: Math.min(1, pdfJobs.length) }, async () => {
     while (nextJob < pdfJobs.length) await pdfJobs[nextJob++]();
   }));
   const readCount = sources.filter(s => s.status === "read").length;
-  const pdfReadCount = sources.filter(s => s.status === "read" && s.note.startsWith("Texto extraído del PDF")).length;
+  const partialCount = sources.filter(s => s.status === "partial").length;
+  const pdfReadCount = sources.filter(s => (s.status === "read" || s.status === "partial") && s.note.startsWith("Texto extraído del PDF")).length;
   return GetSourcesResponse.parse({
     sources: sources.sort((a, b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name, "es", { numeric: true })),
     syncedAt: new Date().toISOString(),
-    warning: `Se revisaron ${visited.size - 1} carpetas dentro de Gestión de ciberseguridad. ${readCount}/${sources.length} documentos leídos, incluidos ${pdfReadCount} PDF. Cobertura de texto: los PDF pueden tener extracción parcial y no se interpretan imágenes ni se aplica OCR. Solo el texto extraído respalda el análisis; archivos pendientes o con error quedan excluidos. Las inferencias de IA requieren revisión humana.`,
+    warning: `Se revisaron ${visited.size - 1} carpetas dentro de Gestión de ciberseguridad. ${readCount}/${sources.length} documentos con texto leído sin recorte; ${partialCount} con extracción parcial. ${pdfReadCount} PDF con texto disponible. No se interpretan imágenes ni se aplica OCR. Solo el texto extraído respalda el análisis; archivos pendientes o con error quedan excluidos. Las inferencias de IA requieren revisión humana.`,
   });
 }
 

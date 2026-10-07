@@ -1,63 +1,62 @@
-import { getDocumentProxy } from "unpdf";
+import { fork } from "node:child_process";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
-export const MAX_PDF_BYTES = 20 * 1024 * 1024;
-const MAX_PAGES = 200;
-const MAX_TEXT = 160_000;
+export const MAX_PDF_BYTES = 128 * 1024 * 1024;
+export const PDF_TIMEOUT_MS = 60_000;
+export const PDF_SIZE_ERROR = "PDF mayor de 128 MiB; no se ha procesado.";
 
-export async function extractPdfText(bytes: Uint8Array) {
-  if (bytes.length > MAX_PDF_BYTES) throw new Error("PDF mayor de 20 MB; no se ha procesado.");
-  const pdf = await getDocumentProxy(bytes, { verbosity: 0 });
-  try {
-    const chunks: string[] = [];
-    let characters = 0;
-    let pagesRead = 0;
-    let emptyPages = 0;
-    for (let pageNumber = 1; pageNumber <= Math.min(pdf.numPages, MAX_PAGES); pageNumber++) {
-      const page = await pdf.getPage(pageNumber);
-      try {
-        const content = await page.getTextContent();
-        const text = content.items.map(item => "str" in item ? `${item.str}${item.hasEOL ? "\n" : " "}` : "").join("").trim();
-        if (!text) emptyPages++;
-        if (text) {
-          const remaining = MAX_TEXT - characters;
-          chunks.push(`[Página ${pageNumber}]\n${text.slice(0, remaining)}`);
-          characters += text.length;
-        }
-        pagesRead = pageNumber;
-        if (characters >= MAX_TEXT) break;
-      } finally { page.cleanup(); }
-    }
-    const text = chunks.join("\n\n");
-    if (!text.trim()) throw new Error("PDF sin texto extraíble. Puede ser un escaneo; requiere OCR y no se utiliza como evidencia.");
-    const partial = pagesRead < pdf.numPages || characters > MAX_TEXT;
-    return {
-      text,
-      note: `Texto extraído del PDF (${pagesRead}/${pdf.numPages} páginas procesadas). ${partial ? "Extracción parcial por límite de 200 páginas o 160.000 caracteres. " : ""}${emptyPages ? `${emptyPages} páginas sin texto extraíble. ` : ""}No se interpretan imágenes ni gráficos; no se ha aplicado OCR. Las citas se verifican contra el texto extraído.`,
-    };
-  } finally { await pdf.loadingTask.destroy(); }
+export interface PdfExtraction {
+  text: string;
+  note: string;
+  partial: boolean;
+  pagesRead: number;
+  totalPages: number;
 }
 
-export async function readPdfDownload(response: Response): Promise<Uint8Array> {
-  if (!response.ok) throw new Error(`No se pudo descargar el PDF (HTTP ${response.status}).`);
-  if (Number(response.headers.get("content-length")) > MAX_PDF_BYTES) {
-    await response.body?.cancel();
-    throw new Error("PDF mayor de 20 MB; no se ha procesado.");
-  }
-  if (!response.body) throw new Error("Descarga del PDF vacía.");
-  const reader = response.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      size += value.byteLength;
-      if (size > MAX_PDF_BYTES) {
-        await reader.cancel();
-        throw new Error("PDF mayor de 20 MB; no se ha procesado.");
-      }
-      chunks.push(value);
-    }
-  } finally { reader.releaseLock(); }
-  return new Uint8Array(Buffer.concat(chunks, size));
+// A separate process prevents a malformed PDF from blocking the API event loop.
+// V8 heap is capped; input bytes, output and concurrency are separately bounded.
+export async function extractPdfText(path: string, timeoutMs = PDF_TIMEOUT_MS): Promise<PdfExtraction> {
+  return runChild("./pdf-worker.mjs", [path], {}, timeoutMs);
 }
+
+function runChild<T>(worker: string, args: string[], env: NodeJS.ProcessEnv, timeoutMs: number): Promise<T> {
+  const child = fork(new URL(worker, import.meta.url), args, {
+    execArgv: ["--max-old-space-size=192"],
+    stdio: ["ignore", "ignore", "ignore", "ipc"],
+    // The parser does not need application secrets or connector credentials.
+    env,
+  });
+  return new Promise((resolve, reject) => {
+    let result: T | undefined;
+    let failure: Error | undefined;
+    const timer = setTimeout(() => {
+      failure = new Error("PDF: tiempo máximo de extracción agotado; no se utiliza como evidencia.");
+      child.kill("SIGKILL");
+    }, timeoutMs);
+    child.on("message", (message: { result?: T; error?: string }) => {
+      if (message.error) failure = new Error(message.error);
+      else result = message.result;
+    });
+    child.on("error", error => { failure = error; });
+    child.on("close", code => {
+      clearTimeout(timer);
+      if (failure) reject(failure);
+      else if (code !== 0 || !result) reject(new Error("PDF: extracción interrumpida o límite de memoria alcanzado; no se utiliza como evidencia."));
+      else resolve(result);
+    });
+  });
+}
+
+// The connector SDK does not accept AbortSignal. Isolate its request so the
+// parent can kill even a request stalled before response headers arrive.
+export async function downloadDrivePdf(fileId: string): Promise<PdfExtraction> {
+  const dir = await mkdtemp(join(tmpdir(), "cubo-pdf-"));
+  const path = join(dir, "document.pdf");
+  try {
+    await runChild("./pdf-download.mjs", [fileId, path, String(MAX_PDF_BYTES)], process.env, PDF_TIMEOUT_MS);
+    return await extractPdfText(path);
+  } finally { await rm(dir, { recursive: true, force: true }); }
+}
+

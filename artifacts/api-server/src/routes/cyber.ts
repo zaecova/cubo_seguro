@@ -56,7 +56,7 @@ router.post("/cyber/analyze", async (req, res) => {
   try {
     const inventory = await getSources();
     const documents = [
-      ...inventory.sources.filter(s => s.status === "read").map(s => ({
+      ...inventory.sources.filter(s => s.status === "read" || s.status === "partial").map(s => ({
         id: s.id, name: `Google Drive · ${s.name}`, text: s.text, url: s.url,
       })),
       ...trustedReferences.map(s => ({
@@ -98,7 +98,7 @@ router.post("/cyber/analyze", async (req, res) => {
     res.json(AnalyzeRiskResponse.parse({
       id: randomUUID(), createdAt: new Date().toISOString(), input: parsed.data, proposals,
       warning: english
-        ? `Only successfully read Drive documents are used (${inventory.sources.filter(s => s.status === "read").length} documents). Unread files are not evidence. Official excerpts from NIST CSF 2.0 and CISA, accessed on October 7, 2026, are also considered. External references do not prove facts about your organization or compliance. Each proposal is an AI inference, not a validated conclusion. Without a verified quote, it is general AI knowledge. Approval does not mean a measure has been implemented.`
+        ? `Only extracted Drive text is used (${inventory.sources.filter(s => s.status === "read").length} documents without text truncation; ${inventory.sources.filter(s => s.status === "partial").length} partially extracted). Images are not interpreted and no OCR is performed. Unread files are not evidence. Official excerpts from NIST CSF 2.0 and CISA, accessed on October 7, 2026, are also considered. External references do not prove facts about your organization or compliance. Each proposal is an AI inference, not a validated conclusion. Without a verified quote, it is general AI knowledge. Approval does not mean a measure has been implemented.`
         : `${inventory.warning} También se consideran fragmentos oficiales de NIST CSF 2.0 y CISA, consultados el 07/10/2026. Las referencias externas no prueban hechos de tu organización ni cumplimiento. Cada propuesta es una inferencia de IA, no una conclusión validada. Sin cita verificada, se considera conocimiento general de IA. Aprobar una medida no significa que ya esté implementada.`,
     }));
   } catch (error) {

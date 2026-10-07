@@ -9,6 +9,7 @@ import { PageHead } from "@/components/layout";
 
 const STATUS: Record<Source["status"], { label: string; cls: string }> = {
   read: { label: "Leído", cls: "bg-primary/10 text-primary" },
+  partial: { label: "Lectura parcial", cls: "bg-accent/25 text-foreground" },
   pending: { label: "Pendiente", cls: "bg-accent/25 text-foreground" },
   error: { label: "Error", cls: "bg-destructive/10 text-destructive" },
 };
@@ -102,8 +103,9 @@ export default function Fuentes() {
                       <a href={current.url} target="_blank" rel="noreferrer" className="inline-flex shrink-0 items-center gap-1 text-xs text-primary hover:underline" data-testid="link-open-drive">Abrir en Drive<ExternalLink className="h-3 w-3" /></a>
                     </div>
                     <div className="p-5">
-                      {current.status === "read" ? (
+                      {current.status === "read" || current.status === "partial" ? (
                         <>
+                          <p className="mb-3 text-sm text-muted-foreground">{current.note}</p>
                           <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-primary">Texto extraído</div>
                           <pre className="max-h-[60vh] overflow-auto whitespace-pre-wrap font-serif text-sm leading-relaxed" data-testid="text-source-content">{current.text || "(Documento leído sin texto.)"}</pre>
                         </>

@@ -1,1 +1,2 @@
 - [Evaluación y fuentes](evaluacion-fuentes.md) — El cubo de McCumber debe separar evidencia documental de inferencias de IA y exigir aprobación individual.
+- [Límites de extracción PDF](pdf-limits.md) — Aislar también la descarga: el SDK de conectores no permite cancelar solicitudes con AbortSignal.

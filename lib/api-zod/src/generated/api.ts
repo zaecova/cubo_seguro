@@ -14,7 +14,7 @@ export const GetSourcesResponse = zod.object({
   "name": zod.string(),
   "folder": zod.string(),
   "url": zod.string(),
-  "status": zod.enum(['read', 'pending', 'error']),
+  "status": zod.enum(['read', 'partial', 'pending', 'error']),
   "text": zod.string(),
   "note": zod.string()
 })),
@@ -29,7 +29,7 @@ export const SyncSourcesResponse = zod.object({
   "name": zod.string(),
   "folder": zod.string(),
   "url": zod.string(),
-  "status": zod.enum(['read', 'pending', 'error']),
+  "status": zod.enum(['read', 'partial', 'pending', 'error']),
   "text": zod.string(),
   "note": zod.string()
 })),

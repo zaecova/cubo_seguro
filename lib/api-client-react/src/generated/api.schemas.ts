@@ -10,6 +10,7 @@ export type SourceStatus = typeof SourceStatus[keyof typeof SourceStatus];
 
 export const SourceStatus = {
   read: 'read',
+  partial: 'partial',
   pending: 'pending',
   error: 'error',
 } as const;

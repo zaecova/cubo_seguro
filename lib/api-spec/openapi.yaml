@@ -66,7 +66,7 @@ components:
         name: { type: string }
         folder: { type: string }
         url: { type: string }
-        status: { type: string, enum: [read, pending, error] }
+        status: { type: string, enum: [read, partial, pending, error] }
         text: { type: string }
         note: { type: string }
     SourceInventory:
