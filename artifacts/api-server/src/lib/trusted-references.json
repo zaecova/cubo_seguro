@@ -1,0 +1,100 @@
+[
+  {
+    "id": "external:nist-csf2:PR.AA-05",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.AA-05 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties"
+  },
+  {
+    "id": "external:nist-csf2:PR.DS-01",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.DS-01 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "The confidentiality, integrity, and availability of data-at-rest are protected"
+  },
+  {
+    "id": "external:nist-csf2:PR.DS-02",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.DS-02 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "The confidentiality, integrity, and availability of data-in-transit are protected"
+  },
+  {
+    "id": "external:nist-csf2:PR.DS-10",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.DS-10 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "The confidentiality, integrity, and availability of data-in-use are protected"
+  },
+  {
+    "id": "external:nist-csf2:PR.DS-11",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.DS-11 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Backups of data are created, protected, maintained, and tested"
+  },
+  {
+    "id": "external:nist-csf2:PR.PS-04",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.PS-04 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Log records are generated and made available for continuous monitoring"
+  },
+  {
+    "id": "external:nist-csf2:ID.RA-09",
+    "name": "NIST · Cybersecurity Framework 2.0 · ID.RA-09 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "The authenticity and integrity of hardware and software are assessed prior to acquisition and use"
+  },
+  {
+    "id": "external:nist-csf2:PR.IR-03",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.IR-03 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Mechanisms are implemented to achieve resilience requirements in normal and adverse situations"
+  },
+  {
+    "id": "external:nist-csf2:PR.IR-04",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.IR-04 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Adequate resource capacity to ensure availability is maintained"
+  },
+  {
+    "id": "external:nist-csf2:PR.IR-01",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.IR-01 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Networks and environments are protected from unauthorized logical access and usage"
+  },
+  {
+    "id": "external:nist-csf2:GV.PO-01",
+    "name": "NIST · Cybersecurity Framework 2.0 · GV.PO-01 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Policy for managing cybersecurity risks is established based on organizational context, cybersecurity strategy, and priorities and is communicated and enforced"
+  },
+  {
+    "id": "external:nist-csf2:ID.IM-04",
+    "name": "NIST · Cybersecurity Framework 2.0 · ID.IM-04 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Incident response plans and other cybersecurity plans that affect operations are established, communicated, maintained, and improved"
+  },
+  {
+    "id": "external:nist-csf2:PR.AT-01",
+    "name": "NIST · Cybersecurity Framework 2.0 · PR.AT-01 · 2024",
+    "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "checkedAt": "2026-10-07",
+    "text": "Personnel are provided with awareness and training so that they possess the knowledge and skills to perform general tasks with cybersecurity risks in mind"
+  },
+  {
+    "id": "external:cisa:mfa",
+    "name": "CISA · Multifactor Authentication (MFA) Toolkit",
+    "url": "https://www.cisa.gov/resources-tools/resources/multifactor-authentication-mfa-toolkit",
+    "checkedAt": "2026-10-07",
+    "text": "Multi-factor authentication (MFA) is a layered approach to securing your accounts online."
+  }
+]

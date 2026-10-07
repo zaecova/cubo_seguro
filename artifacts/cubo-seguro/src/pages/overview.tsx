@@ -110,6 +110,7 @@ export default function Overview() {
             )}
             <p className="text-xs text-muted-foreground">Amenaza, vulnerabilidad e información requieren al menos 3 caracteres.</p>
           </div>
+          <p className="mt-4 text-xs text-muted-foreground">El análisis considera los documentos leídos de «Gestión de ciberseguridad» y fragmentos oficiales de NIST CSF 2.0 y CISA. Cada cita identifica su origen y enlace. Las referencias externas son un catálogo verificado, no una búsqueda web en tiempo real.</p>
         </form>
 
         <aside className="rise space-y-6 text-sm" style={{ animationDelay: "200ms" }}>

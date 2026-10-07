@@ -2,6 +2,12 @@
 name: Evaluación y fuentes
 description: Requisitos del usuario sobre McCumber, procedencia y aprobación humana.
 ---
+El usuario permite complementar su carpeta con referencias externas aceptables, identificando de qué fuente se obtuvo cada respaldo.
+
+**Why:** Pidió considerar otras referencias además de la información de su carpeta y mostrar su procedencia.
+
+**How to apply:** Usar fuentes oficiales verificadas, diferenciar Drive de referencias externas y conservar cita original, organismo y enlace. Una referencia conceptual no prueba hechos de la organización. No modificar retroactivamente el respaldo de decisiones ya guardadas.
+
 Modelo McCumber debe ir primero en el menú. La selección de principios, estados o contramedidas debe mostrar tres ejemplos relacionados, con validación individual como las propuestas.
 
 **Why:** El usuario pidió reorganizar la navegación y aprender mediante ejemplos que pueda validar.

@@ -1,5 +1,6 @@
 import { AXES, type Axis } from "./mccumber";
 import { newEvaluation } from "./store";
+import { exampleReference } from "./external-references";
 
 const EXAMPLES: Record<Axis, string[][]> = {
   principle: [
@@ -67,14 +68,14 @@ export function exampleEvaluation(axis: Axis, index: number) {
       vulnerability: `Ejemplos centrados en ${layer.label.toLowerCase()}.`,
       information: "La información afectada se describe en cada ejemplo.",
     },
-    warning: "Ejemplos didácticos predefinidos, sin consulta a Drive ni generación de IA en tiempo real.",
+    warning: "Ejemplos didácticos predefinidos con referencias oficiales externas de apoyo conceptual. No son ejemplos escritos por NIST o CISA ni resultados de una consulta a Drive o generación de IA en tiempo real.",
     proposals: EXAMPLES[axis][index].map((text, i) => ({
       id: `${id}-${i + 1}`,
       dimension: axis,
       category: `${layer.label} · Ejemplo ${i + 1}`,
       text,
       rationale: `${AXES[axis].label}: ${layer.label}. ${layer.desc}`,
-      evidence: [],
+      evidence: [exampleReference(axis, index, i)],
     })),
   });
 }

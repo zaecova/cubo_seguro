@@ -155,13 +155,17 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
               <p className="leading-relaxed">{p.rationale}</p>
             </div>
             <div className="rounded-lg border-2 border-green-300 border-l-[5px] border-l-green-700 bg-green-50 p-4 text-sm text-black shadow-sm">
-              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />Qué dice la información guardada</div>
+              <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-green-900"><Quote className="h-5 w-5 shrink-0" />Qué dicen las fuentes</div>
+              {example && p.evidence.length > 0 && <p className="mb-3 text-xs">Apoyo conceptual externo. La cita no describe este caso ni prescribe necesariamente la medida concreta del ejemplo.</p>}
               {p.evidence.length === 0 ? (
                 <p className="text-black" data-testid={`text-no-evidence-${p.id}`}>{example ? "Ejemplo educativo predefinido. No se han consultado documentos para este ejemplo; no constituye evidencia documental." : <>No se encontró una cita en los documentos leídos que respalde esta propuesta. Esta afirmación se basa en <strong>conocimiento general de la IA</strong>, no en la información guardada.</>}</p>
               ) : (
                 <ul className="space-y-3">
                   {p.evidence.map((e, i) => (
                     <li key={i}>
+                      <div className="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wide">
+                        {e.sourceId.startsWith("external:") ? "Referencia oficial externa · cita original en inglés" : "Documento de tu carpeta · Google Drive"}
+                      </div>
                       <blockquote className="font-serif italic leading-relaxed">«{e.quote}»</blockquote>
                       <a href={e.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline">{e.sourceName}<ExternalLink className="h-3 w-3" /></a>
                     </li>
