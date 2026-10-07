@@ -5,6 +5,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { z } from "zod";
 import { getSources } from "../lib/cyber-sources";
 import trustedReferences from "../lib/trusted-references.json";
+import { selectSourceExcerpts } from "../lib/source-excerpts";
 
 const router: IRouter = Router();
 // Never expose the owner's connected Drive through a public deployment.
@@ -62,6 +63,7 @@ router.post("/cyber/analyze", async (req, res) => {
         id: s.id, name: `Referencia externa · ${s.name} · Consultada ${s.checkedAt}`, text: s.text, url: s.url,
       })),
     ];
+    const excerpts = selectSourceExcerpts(documents, Object.values(parsed.data).join(" "));
     const response = await openai.chat.completions.create({
       model: "gpt-5.4-mini",
       max_completion_tokens: 8192,
@@ -73,7 +75,8 @@ router.post("/cyber/analyze", async (req, res) => {
         { role: "system", content: english
           ? 'Respond with text and rationale entirely in English. Set categories to "Security principles", "Information states", and "Countermeasures", respectively, overriding the earlier Spanish category names. Keep evidence.quote in its original language and verbatim. Do not translate documentary quotes.'
           : "Responde con text y rationale en español. Conserva las citas documentales en su idioma original." },
-        { role: "user", content: JSON.stringify({ scenario: parsed.data, documents }) },
+        { role: "system", content: "Los documentos suministrados contienen fragmentos seleccionados por relevancia, no necesariamente el documento completo. Los PDF contienen solo texto extraído, sin interpretación de imágenes ni OCR. No afirmes haber revisado páginas o contenidos no suministrados." },
+        { role: "user", content: JSON.stringify({ scenario: parsed.data, documents: excerpts }) },
       ],
     }, { timeout: 90000 });
     const result = aiSchema.parse(JSON.parse(response.choices[0]?.message.content ?? ""));

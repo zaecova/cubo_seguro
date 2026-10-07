@@ -8,6 +8,12 @@ El usuario permite complementar su carpeta con referencias externas aceptables, 
 
 **How to apply:** Usar fuentes oficiales verificadas, diferenciar Drive de referencias externas y conservar cita original, organismo y enlace. Una referencia conceptual no prueba hechos de la organización. No modificar retroactivamente el respaldo de decisiones ya guardadas.
 
+Al incorporar la biblioteca PDF, seleccionar fragmentos pertinentes y acotados para el análisis, sin presentar esa selección como una lectura exhaustiva.
+
+**Why:** El corpus completo puede exceder el contexto del modelo; además, extraer texto de un PDF no implica comprender sus gráficos o imágenes.
+
+**How to apply:** Verificar citas contra texto realmente extraído, indicar límites y excluir archivos fallidos. No confundir extracción de texto con OCR.
+
 Modelo McCumber debe ir primero en el menú. La selección de principios, estados o contramedidas debe mostrar tres ejemplos relacionados, con validación individual como las propuestas.
 
 **Why:** El usuario pidió reorganizar la navegación y aprender mediante ejemplos que pueda validar.

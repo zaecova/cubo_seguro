@@ -1,6 +1,7 @@
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import { GetSourcesResponse } from "@workspace/api-zod";
 import type { z } from "zod";
+import { extractPdfText, readPdfDownload, MAX_PDF_BYTES } from "./pdf-text";
 
 type Inventory = z.infer<typeof GetSourcesResponse>;
 const rootFolder = { id: "1rXkfXrQTjHm-u8f9ilHTVV6nZlo5VchJ", name: "Gestión de ciberseguridad" };
@@ -13,6 +14,7 @@ async function load(): Promise<Inventory> {
   const folders = [{ ...rootFolder }];
   const visited = new Set<string>();
   const seenFiles = new Set<string>();
+  const pdfJobs: (() => Promise<void>)[] = [];
   for (const folder of folders) {
     if (visited.has(folder.id)) continue;
     visited.add(folder.id);
@@ -20,13 +22,13 @@ async function load(): Promise<Inventory> {
     do {
       const params = new URLSearchParams({
         q: `'${folder.id}' in parents and trashed = false`,
-        fields: "nextPageToken,incompleteSearch,files(id,name,mimeType,webViewLink)",
+        fields: "nextPageToken,incompleteSearch,files(id,name,mimeType,webViewLink,size)",
         pageSize: "100", ...(pageToken ? { pageToken } : {}),
       });
       const response = await connector.proxy("google-drive", `/drive/v3/files?${params}`, { method: "GET" });
       if (!response.ok) throw new Error(`Drive devolvió ${response.status}. No se pudo consultar la carpeta.`);
       const data = await response.json() as {
-        files: { id: string; name: string; mimeType: string; webViewLink?: string }[];
+        files: { id: string; name: string; mimeType: string; webViewLink?: string; size?: string }[];
         nextPageToken?: string; incompleteSearch?: boolean;
       };
       if (data.incompleteSearch) throw new Error("Drive devolvió un inventario incompleto. Intenta sincronizar nuevamente.");
@@ -42,11 +44,29 @@ async function load(): Promise<Inventory> {
         seenFiles.add(file.id);
         const source: Inventory["sources"][number] = {
           id: file.id, name: file.name, folder: folder.name,
-          url: file.webViewLink || "", status: "pending", text: "",
+          url: file.webViewLink || `https://drive.google.com/file/d/${encodeURIComponent(file.id)}/view`, status: "pending", text: "",
           note: file.mimeType === "application/pdf"
             ? "PDF pendiente de extracción. No se utiliza como evidencia en el análisis."
             : "Formato pendiente de procesamiento. No se utiliza como evidencia en el análisis.",
         };
+        if (file.mimeType === "application/pdf") {
+          pdfJobs.push(async () => {
+            try {
+              if (Number(file.size) > MAX_PDF_BYTES) throw new Error("PDF mayor de 20 MB; no se ha procesado.");
+              const downloaded = await connector.proxy("google-drive", `/drive/v3/files/${encodeURIComponent(file.id)}?alt=media`, { method: "GET" });
+              const extracted = await extractPdfText(await readPdfDownload(downloaded));
+              source.text = extracted.text;
+              source.note = extracted.note;
+              source.status = "read";
+            } catch (error) {
+              source.status = "error";
+              source.text = "";
+              source.note = error instanceof Error && /PDF mayor|sin texto extraíble/.test(error.message)
+                ? error.message
+                : "No se pudo extraer el PDF: puede estar protegido, dañado o no disponible. No se utiliza como evidencia; vuelve a sincronizar.";
+            }
+          });
+        }
         if (["application/vnd.google-apps.document", "application/vnd.google-apps.presentation"].includes(file.mimeType)) {
           try {
             const exported = await connector.proxy("google-drive", `/drive/v3/files/${encodeURIComponent(file.id)}/export?mimeType=text%2Fplain`, { method: "GET" });
@@ -67,10 +87,17 @@ async function load(): Promise<Inventory> {
       pageToken = data.nextPageToken || "";
     } while (pageToken);
   }
+  // Bound parallel downloads and parsing to avoid exhausting memory.
+  let nextJob = 0;
+  await Promise.all(Array.from({ length: Math.min(3, pdfJobs.length) }, async () => {
+    while (nextJob < pdfJobs.length) await pdfJobs[nextJob++]();
+  }));
+  const readCount = sources.filter(s => s.status === "read").length;
+  const pdfReadCount = sources.filter(s => s.status === "read" && s.note.startsWith("Texto extraído del PDF")).length;
   return GetSourcesResponse.parse({
     sources: sources.sort((a, b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name, "es", { numeric: true })),
     syncedAt: new Date().toISOString(),
-    warning: `Se revisaron ${visited.size - 1} carpetas dentro de Gestión de ciberseguridad. Cobertura parcial: solo los documentos marcados como leídos respaldan el análisis. Los archivos pendientes no han sido interpretados. Las inferencias de IA requieren revisión humana.`,
+    warning: `Se revisaron ${visited.size - 1} carpetas dentro de Gestión de ciberseguridad. ${readCount}/${sources.length} documentos leídos, incluidos ${pdfReadCount} PDF. Cobertura de texto: los PDF pueden tener extracción parcial y no se interpretan imágenes ni se aplica OCR. Solo el texto extraído respalda el análisis; archivos pendientes o con error quedan excluidos. Las inferencias de IA requieren revisión humana.`,
   });
 }
 
