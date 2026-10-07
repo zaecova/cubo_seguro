@@ -12,6 +12,7 @@ export default function Modelo() {
   const [sel, setSel] = useState<Sel>({ principle: 0, state: 0, countermeasure: 0 });
   const [rot, setRot] = useState({ x: -24, y: 36 });
   const [activeAxis, setActiveAxis] = useState<Axis>("principle");
+  const [showCards, setShowCards] = useState(false);
   const p = AXES.principle.items[sel.principle];
   const s = AXES.state.items[sel.state];
   const c = AXES.countermeasure.items[sel.countermeasure];
@@ -21,11 +22,11 @@ export default function Modelo() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">
       <PageHead kicker="Marco conceptual" title={<>El cubo de <em className="text-primary">McCumber</em></>}>
-        <p className="max-w-sm text-sm text-muted-foreground">Selecciona una dimensión y una capa para ver tres ejemplos y validar cada uno.</p>
+        <p className="max-w-sm text-sm text-muted-foreground">Selecciona una dimensión y una capa. Después pulsa «Mostrar tres tarjetas» para revisar los ejemplos.</p>
       </PageHead>
       <div className="mb-6 flex flex-wrap gap-3" aria-label="Dimensión para los ejemplos">
         {AX.map((axis) => (
-          <Button key={axis} variant={activeAxis === axis ? "default" : "outline"} aria-pressed={activeAxis === axis} onClick={() => setActiveAxis(axis)} data-testid={`button-dimension-${axis}`}>
+          <Button key={axis} variant={activeAxis === axis ? "default" : "outline"} aria-pressed={activeAxis === axis} onClick={() => { setActiveAxis(axis); setShowCards(false); }} data-testid={`button-dimension-${axis}`}>
             {axis === "principle" ? "Principios" : axis === "state" ? "Estados de la información" : "Contramedidas"}
           </Button>
         ))}
@@ -71,7 +72,7 @@ export default function Modelo() {
               <p className="mb-2 text-sm text-muted-foreground">{AXES[a].question}</p>
               <div className="grid grid-cols-3 gap-2" role="radiogroup">
                 {AXES[a].items.map((it, i) => (
-                  <button key={it.key} role="radio" aria-checked={sel[a] === i} onClick={() => { setSel({ ...sel, [a]: i }); setActiveAxis(a); }}
+                  <button key={it.key} role="radio" aria-checked={sel[a] === i} onClick={() => { setSel({ ...sel, [a]: i }); setActiveAxis(a); setShowCards(false); }}
                     className={`rounded-md border px-2 py-2.5 text-sm transition-all active:scale-95 ${sel[a] === i ? "border-foreground bg-accent text-accent-foreground" : "border-border bg-card hover:border-primary"}`}
                     data-testid={`button-axis-${a}-${it.key}`}>
                     {it.label}
@@ -96,7 +97,15 @@ export default function Modelo() {
           <p className="text-xs text-muted-foreground">El cubo conserva las 27 combinaciones. Los ejemplos de abajo corresponden a la última dimensión y capa seleccionadas, no a una evaluación completa de la combinación.</p>
         </div>
       </div>
-      <ModelExamples axis={activeAxis} index={sel[activeAxis]} />
+      <div className="mt-8 rounded-xl border border-border bg-card p-5">
+        <p className="mb-3 text-sm">Ejemplos de <strong>{AXES[activeAxis].label} · {AXES[activeAxis].items[sel[activeAxis]].label}</strong></p>
+        <Button onClick={() => setShowCards((visible) => !visible)} aria-expanded={showCards} aria-controls="selected-example-cards" data-testid="button-show-example-cards">
+          {showCards ? "Ocultar tarjetas" : "Mostrar tres tarjetas"}
+        </Button>
+      </div>
+      <div id="selected-example-cards">
+        {showCards && <ModelExamples axis={activeAxis} index={sel[activeAxis]} />}
+      </div>
     </div>
   );
 }
