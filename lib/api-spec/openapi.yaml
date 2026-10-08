@@ -21,14 +21,22 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SourceInventory" }
   /cyber/sync:
+    get:
+      operationId: getSyncStatus
+      responses:
+        "200":
+          description: Current in-process synchronization job; idle after server restart
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SyncJob" }
     post:
       operationId: syncSources
       responses:
-        "200":
-          description: Refreshed source inventory
+        "202":
+          description: Started or reused the running synchronization
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/SourceInventory" }
+              schema: { $ref: "#/components/schemas/SyncJob" }
   /cyber/analyze:
     post:
       operationId: analyzeRisk
@@ -58,6 +66,21 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    SyncJob:
+      type: object
+      required: [id, status, phase, discovered, processed, errors, currentFile, startedAt, finishedAt, error, hasInventory]
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [idle, running, succeeded, failed] }
+        phase: { type: string, enum: [idle, inventory, pdf, complete] }
+        discovered: { type: integer, minimum: 0 }
+        processed: { type: integer, minimum: 0 }
+        errors: { type: integer, minimum: 0 }
+        currentFile: { type: string }
+        startedAt: { type: string }
+        finishedAt: { type: string }
+        error: { type: string }
+        hasInventory: { type: boolean }
     Source:
       type: object
       required: [id, name, folder, url, status, text, note]
@@ -80,9 +103,11 @@ components:
         warning: { type: string }
     RiskInput:
       type: object
-      required: [title, threat, vulnerability, information]
+      required: [title]
+      description: Provide content for new analyses; legacy records may contain threat, vulnerability and information instead.
       properties:
         title: { type: string, minLength: 1, maxLength: 200 }
+        content: { type: string, minLength: 3, maxLength: 9000 }
         threat: { type: string, minLength: 3, maxLength: 3000 }
         vulnerability: { type: string, minLength: 3, maxLength: 3000 }
         information: { type: string, minLength: 3, maxLength: 3000 }
@@ -113,6 +138,7 @@ components:
         id: { type: string }
         createdAt: { type: string }
         input: { $ref: "#/components/schemas/RiskInput" }
+        summary: { type: string, description: Integrated answer for the Summary page }
         proposals:
           type: array
           items: { $ref: "#/components/schemas/Proposal" }

@@ -23,22 +23,56 @@ export const GetSourcesResponse = zod.object({
 })
 
 
-export const SyncSourcesResponse = zod.object({
-  "sources": zod.array(zod.object({
+export const getSyncStatusResponseDiscoveredMin = 0;
+
+export const getSyncStatusResponseProcessedMin = 0;
+
+export const getSyncStatusResponseErrorsMin = 0;
+
+
+
+export const GetSyncStatusResponse = zod.object({
   "id": zod.string(),
-  "name": zod.string(),
-  "folder": zod.string(),
-  "url": zod.string(),
-  "status": zod.enum(['read', 'partial', 'pending', 'error']),
-  "text": zod.string(),
-  "note": zod.string()
-})),
-  "syncedAt": zod.string(),
-  "warning": zod.string()
+  "status": zod.enum(['idle', 'running', 'succeeded', 'failed']),
+  "phase": zod.enum(['idle', 'inventory', 'pdf', 'complete']),
+  "discovered": zod.number().int().min(getSyncStatusResponseDiscoveredMin),
+  "processed": zod.number().int().min(getSyncStatusResponseProcessedMin),
+  "errors": zod.number().int().min(getSyncStatusResponseErrorsMin),
+  "currentFile": zod.string(),
+  "startedAt": zod.string(),
+  "finishedAt": zod.string(),
+  "error": zod.string(),
+  "hasInventory": zod.boolean()
+})
+
+
+export const syncSourcesResponseDiscoveredMin = 0;
+
+export const syncSourcesResponseProcessedMin = 0;
+
+export const syncSourcesResponseErrorsMin = 0;
+
+
+
+export const SyncSourcesResponse = zod.object({
+  "id": zod.string(),
+  "status": zod.enum(['idle', 'running', 'succeeded', 'failed']),
+  "phase": zod.enum(['idle', 'inventory', 'pdf', 'complete']),
+  "discovered": zod.number().int().min(syncSourcesResponseDiscoveredMin),
+  "processed": zod.number().int().min(syncSourcesResponseProcessedMin),
+  "errors": zod.number().int().min(syncSourcesResponseErrorsMin),
+  "currentFile": zod.string(),
+  "startedAt": zod.string(),
+  "finishedAt": zod.string(),
+  "error": zod.string(),
+  "hasInventory": zod.boolean()
 })
 
 
 export const analyzeRiskBodyTitleMax = 200;
+
+export const analyzeRiskBodyContentMin = 3;
+export const analyzeRiskBodyContentMax = 9000;
 
 export const analyzeRiskBodyThreatMin = 3;
 export const analyzeRiskBodyThreatMax = 3000;
@@ -53,12 +87,16 @@ export const analyzeRiskBodyInformationMax = 3000;
 
 export const AnalyzeRiskBody = zod.object({
   "title": zod.string().min(1).max(analyzeRiskBodyTitleMax),
-  "threat": zod.string().min(analyzeRiskBodyThreatMin).max(analyzeRiskBodyThreatMax),
-  "vulnerability": zod.string().min(analyzeRiskBodyVulnerabilityMin).max(analyzeRiskBodyVulnerabilityMax),
-  "information": zod.string().min(analyzeRiskBodyInformationMin).max(analyzeRiskBodyInformationMax)
-})
+  "content": zod.string().min(analyzeRiskBodyContentMin).max(analyzeRiskBodyContentMax).optional(),
+  "threat": zod.string().min(analyzeRiskBodyThreatMin).max(analyzeRiskBodyThreatMax).optional(),
+  "vulnerability": zod.string().min(analyzeRiskBodyVulnerabilityMin).max(analyzeRiskBodyVulnerabilityMax).optional(),
+  "information": zod.string().min(analyzeRiskBodyInformationMin).max(analyzeRiskBodyInformationMax).optional()
+}).describe('Provide content for new analyses; legacy records may contain threat, vulnerability and information instead.')
 
 export const analyzeRiskResponseInputTitleMax = 200;
+
+export const analyzeRiskResponseInputContentMin = 3;
+export const analyzeRiskResponseInputContentMax = 9000;
 
 export const analyzeRiskResponseInputThreatMin = 3;
 export const analyzeRiskResponseInputThreatMax = 3000;
@@ -76,10 +114,12 @@ export const AnalyzeRiskResponse = zod.object({
   "createdAt": zod.string(),
   "input": zod.object({
   "title": zod.string().min(1).max(analyzeRiskResponseInputTitleMax),
-  "threat": zod.string().min(analyzeRiskResponseInputThreatMin).max(analyzeRiskResponseInputThreatMax),
-  "vulnerability": zod.string().min(analyzeRiskResponseInputVulnerabilityMin).max(analyzeRiskResponseInputVulnerabilityMax),
-  "information": zod.string().min(analyzeRiskResponseInputInformationMin).max(analyzeRiskResponseInputInformationMax)
-}),
+  "content": zod.string().min(analyzeRiskResponseInputContentMin).max(analyzeRiskResponseInputContentMax).optional(),
+  "threat": zod.string().min(analyzeRiskResponseInputThreatMin).max(analyzeRiskResponseInputThreatMax).optional(),
+  "vulnerability": zod.string().min(analyzeRiskResponseInputVulnerabilityMin).max(analyzeRiskResponseInputVulnerabilityMax).optional(),
+  "information": zod.string().min(analyzeRiskResponseInputInformationMin).max(analyzeRiskResponseInputInformationMax).optional()
+}).describe('Provide content for new analyses; legacy records may contain threat, vulnerability and information instead.'),
+  "summary": zod.string().optional().describe('Integrated answer for the Summary page'),
   "proposals": zod.array(zod.object({
   "id": zod.string(),
   "dimension": zod.enum(['principle', 'state', 'information', 'countermeasure']),

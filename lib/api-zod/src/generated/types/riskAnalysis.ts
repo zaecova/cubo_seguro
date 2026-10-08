@@ -12,6 +12,8 @@ export interface RiskAnalysis {
   id: string;
   createdAt: string;
   input: RiskInput;
+  /** Integrated answer for the Summary page */
+  summary?: string;
   proposals: Proposal[];
   warning: string;
 }

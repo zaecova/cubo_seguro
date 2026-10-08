@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Provide content for new analyses; legacy records may contain threat, vulnerability and information instead.
+ */
 export interface RiskInput {
   /**
      * @minLength 1
@@ -14,17 +17,22 @@ export interface RiskInput {
   title: string;
   /**
      * @minLength 3
-     * @maxLength 3000
+     * @maxLength 9000
      */
-  threat: string;
+  content?: string;
   /**
      * @minLength 3
      * @maxLength 3000
      */
-  vulnerability: string;
+  threat?: string;
   /**
      * @minLength 3
      * @maxLength 3000
      */
-  information: string;
+  vulnerability?: string;
+  /**
+     * @minLength 3
+     * @maxLength 3000
+     */
+  information?: string;
 }

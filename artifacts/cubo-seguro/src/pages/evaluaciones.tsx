@@ -62,7 +62,7 @@ export default function Evaluaciones() {
               <li key={e.analysis.id} className="rise group flex items-center gap-4 p-4 md:p-5" style={{ animationDelay: `${i * 30}ms` }} data-testid={`row-eval-${e.analysis.id}`}>
                 <Link href={`/evaluaciones/${e.analysis.id}`} className="min-w-0 flex-1" data-testid={`link-eval-${e.analysis.id}`}>
                   <div translate="no" className="truncate font-medium group-hover:text-primary">{e.analysis.input.title}</div>
-                  <div translate="no" className="mt-1 truncate text-sm text-muted-foreground">{e.analysis.input.threat}</div>
+                  <div translate="no" className="mt-1 truncate text-sm text-muted-foreground">{e.analysis.input.content ?? e.analysis.input.threat}</div>
                   <div className="mt-2 flex flex-wrap gap-3 font-mono text-[11px] text-muted-foreground">
                     <span>{new Date(e.analysis.createdAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })}</span>
                     <span className="text-primary">{c.approved} aprobadas</span>

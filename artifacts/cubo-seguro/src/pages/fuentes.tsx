@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { getGetSourcesQueryKey, useGetSources, useSyncSources, type Source } from "@workspace/api-client-react";
+import { useGetSources, type Source } from "@workspace/api-client-react";
 import { RefreshCw, ExternalLink, AlertTriangle, FileText, Clock, CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
+import { DriveSync } from "@/components/drive-sync";
 import { PageHead } from "@/components/layout";
 
 const STATUS: Record<Source["status"], { label: string; cls: string }> = {
@@ -16,16 +15,7 @@ const STATUS: Record<Source["status"], { label: string; cls: string }> = {
 
 export default function Fuentes() {
   const q = useGetSources();
-  const sync = useSyncSources();
-  const qc = useQueryClient();
-  const { toast } = useToast();
   const [sel, setSel] = useState<string | null>(null);
-
-  const doSync = () =>
-    sync.mutate(undefined, {
-      onSuccess: () => { qc.invalidateQueries({ queryKey: getGetSourcesQueryKey() }); toast({ title: "Drive sincronizado" }); },
-      onError: () => toast({ title: "No se pudo sincronizar", description: "El servidor rechazó la sincronización con Drive.", variant: "destructive" }),
-    });
 
   const sources = q.data?.sources ?? [];
   const read = sources.filter((s) => s.status === "read").length;
@@ -35,10 +25,8 @@ export default function Fuentes() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">
       <PageHead kicker="Google Drive" title="Fuentes">
-        <Button onClick={doSync} disabled={sync.isPending} data-testid="button-sync">
-          <RefreshCw className={`h-4 w-4 ${sync.isPending ? "animate-spin" : ""}`} />{sync.isPending ? "Sincronizando…" : "Sincronizar"}
-        </Button>
       </PageHead>
+      <DriveSync />
 
       {q.isLoading ? (
         <div className="space-y-3">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}</div>

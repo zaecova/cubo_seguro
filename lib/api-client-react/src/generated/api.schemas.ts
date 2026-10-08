@@ -5,6 +5,43 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export type SyncJobStatus = typeof SyncJobStatus[keyof typeof SyncJobStatus];
+
+
+export const SyncJobStatus = {
+  idle: 'idle',
+  running: 'running',
+  succeeded: 'succeeded',
+  failed: 'failed',
+} as const;
+
+export type SyncJobPhase = typeof SyncJobPhase[keyof typeof SyncJobPhase];
+
+
+export const SyncJobPhase = {
+  idle: 'idle',
+  inventory: 'inventory',
+  pdf: 'pdf',
+  complete: 'complete',
+} as const;
+
+export interface SyncJob {
+  id: string;
+  status: SyncJobStatus;
+  phase: SyncJobPhase;
+  /** @minimum 0 */
+  discovered: number;
+  /** @minimum 0 */
+  processed: number;
+  /** @minimum 0 */
+  errors: number;
+  currentFile: string;
+  startedAt: string;
+  finishedAt: string;
+  error: string;
+  hasInventory: boolean;
+}
+
 export type SourceStatus = typeof SourceStatus[keyof typeof SourceStatus];
 
 
@@ -31,6 +68,9 @@ export interface SourceInventory {
   warning: string;
 }
 
+/**
+ * Provide content for new analyses; legacy records may contain threat, vulnerability and information instead.
+ */
 export interface RiskInput {
   /**
      * @minLength 1
@@ -39,19 +79,24 @@ export interface RiskInput {
   title: string;
   /**
      * @minLength 3
-     * @maxLength 3000
+     * @maxLength 9000
      */
-  threat: string;
+  content?: string;
   /**
      * @minLength 3
      * @maxLength 3000
      */
-  vulnerability: string;
+  threat?: string;
   /**
      * @minLength 3
      * @maxLength 3000
      */
-  information: string;
+  vulnerability?: string;
+  /**
+     * @minLength 3
+     * @maxLength 3000
+     */
+  information?: string;
 }
 
 export interface Evidence {
@@ -84,6 +129,8 @@ export interface RiskAnalysis {
   id: string;
   createdAt: string;
   input: RiskInput;
+  /** Integrated answer for the Summary page */
+  summary?: string;
   proposals: Proposal[];
   warning: string;
 }

@@ -1,9 +1,9 @@
 import { Router, type IRouter } from "express";
 import { randomUUID } from "node:crypto";
-import { AnalyzeRiskBody, AnalyzeRiskResponse, GetSourcesResponse } from "@workspace/api-zod";
+import { AnalyzeRiskBody, AnalyzeRiskResponse, GetSourcesResponse, GetSyncStatusResponse, SyncSourcesResponse } from "@workspace/api-zod";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { z } from "zod";
-import { getSources } from "../lib/cyber-sources";
+import { getSources, getSyncStatus, startSync, getCompletedSources } from "../lib/cyber-sources";
 import trustedReferences from "../lib/trusted-references.json";
 import { selectSourceExcerpts } from "../lib/source-excerpts";
 
@@ -25,12 +25,15 @@ router.get("/cyber/sources", async (_req, res) => {
   try { res.json(GetSourcesResponse.parse(await getSources())); }
   catch { res.status(502).json({ error: "No se pudo consultar Google Drive. Revisa la conexión y vuelve a intentarlo." }); }
 });
-router.post("/cyber/sync", async (_req, res) => {
-  try { res.json(GetSourcesResponse.parse(await getSources(true))); }
-  catch { res.status(502).json({ error: "No se pudo sincronizar Google Drive. No se ha reemplazado el último inventario." }); }
+router.get("/cyber/sync", (_req, res) => {
+  res.json(GetSyncStatusResponse.parse(getSyncStatus()));
+});
+router.post("/cyber/sync", (_req, res) => {
+  res.status(202).json(SyncSourcesResponse.parse(startSync()));
 });
 
 const aiSchema = z.object({
+  summary: z.string().min(1).max(5000),
   proposals: z.array(z.object({
     dimension: z.enum(["principle", "state", "countermeasure"]),
     category: z.string().min(1).max(200),
@@ -48,13 +51,20 @@ let busy = false;
 router.post("/cyber/analyze", async (req, res) => {
   const english = req.get("accept-language")?.split(",")[0].trim().toLowerCase().startsWith("en") ?? false;
   const parsed = AnalyzeRiskBody.safeParse(req.body);
-  if (!parsed.success || Object.values(parsed.data ?? {}).some(v => !v.trim())) {
-    res.status(400).json({ error: "Completa el título, la amenaza, la vulnerabilidad y la información afectada." }); return;
+  if (!parsed.success || !parsed.data.title.trim() ||
+      (parsed.data.content !== undefined
+        ? parsed.data.content.trim().length < 3
+        : ![parsed.data.threat, parsed.data.vulnerability, parsed.data.information].every(v => v && v.trim().length >= 3))) {
+    res.status(400).json({ error: "Completa el título y el contenido, describiendo la amenaza, la vulnerabilidad y la información afectada." }); return;
   }
   if (busy) { res.status(429).json({ error: "Hay un análisis en curso. Espera unos segundos." }); return; }
+  const inventory = getCompletedSources() ?? {
+    sources: [],
+    syncedAt: "",
+    warning: "No hay un inventario completo de Drive disponible. Esta respuesta considera únicamente los fragmentos oficiales externos suministrados, no documentos de Drive.",
+  };
   busy = true;
   try {
-    const inventory = await getSources();
     const documents = [
       ...inventory.sources.filter(s => s.status === "read" || s.status === "partial").map(s => ({
         id: s.id, name: `Google Drive · ${s.name}`, text: s.text, url: s.url,
@@ -76,6 +86,8 @@ router.post("/cyber/analyze", async (req, res) => {
           ? 'Respond with text and rationale entirely in English. Set categories to "Security principles", "Information states", and "Countermeasures", respectively, overriding the earlier Spanish category names. Keep evidence.quote in its original language and verbatim. Do not translate documentary quotes.'
           : "Responde con text y rationale en español. Conserva las citas documentales en su idioma original." },
         { role: "system", content: "Los documentos suministrados contienen fragmentos seleccionados por relevancia, no necesariamente el documento completo. Los PDF contienen solo texto extraído, sin interpretación de imágenes ni OCR. No afirmes haber revisado páginas o contenidos no suministrados." },
+        { role: "system", content: "El escenario puede incluir title y content. En ese caso content es el texto original del usuario que reúne amenaza, vulnerabilidad e información afectada: identifica esos elementos en contexto, sin exigir campos separados ni inventar datos ausentes. Si falta un elemento, indica expresamente qué información falta y limita las conclusiones; no trates supuestos como hechos." },
+        { role: "system", content: "Añade al JSON una propiedad summary: una sola respuesta integrada y concisa, de 1 a 3 párrafos, en el idioma solicitado. Relaciona amenaza, vulnerabilidad e información afectada, explica las dimensiones de McCumber pertinentes y recomienda medidas proporcionales, sin enumerar tres propuestas independientes. La respuesta es una inferencia de IA, nunca una conclusión aprobada. Usa solo el escenario y los fragmentos suministrados; distingue los supuestos y no atribuyas a Drive información si no hay documentos de Drive. Conserva proposals para la revisión detallada. Las citas de proposals deben respaldar también aspectos de summary cuando corresponda, sin forzarlas." },
         { role: "user", content: JSON.stringify({ scenario: parsed.data, documents: excerpts }) },
       ],
     }, { timeout: 90000 });
@@ -96,7 +108,7 @@ router.post("/cyber/analyze", async (req, res) => {
       }).slice(0, 1),
     }));
     res.json(AnalyzeRiskResponse.parse({
-      id: randomUUID(), createdAt: new Date().toISOString(), input: parsed.data, proposals,
+      id: randomUUID(), createdAt: new Date().toISOString(), input: parsed.data, proposals, summary: result.summary,
       warning: english
         ? `Only extracted Drive text is used (${inventory.sources.filter(s => s.status === "read").length} documents without text truncation; ${inventory.sources.filter(s => s.status === "partial").length} partially extracted). Images are not interpreted and no OCR is performed. Unread files are not evidence. Official excerpts from NIST CSF 2.0 and CISA, accessed on October 7, 2026, are also considered. External references do not prove facts about your organization or compliance. Each proposal is an AI inference, not a validated conclusion. Without a verified quote, it is general AI knowledge. Approval does not mean a measure has been implemented.`
         : `${inventory.warning} También se consideran fragmentos oficiales de NIST CSF 2.0 y CISA, consultados el 07/10/2026. Las referencias externas no prueban hechos de tu organización ni cumplimiento. Cada propuesta es una inferencia de IA, no una conclusión validada. Sin cita verificada, se considera conocimiento general de IA. Aprobar una medida no significa que ya esté implementada.`,

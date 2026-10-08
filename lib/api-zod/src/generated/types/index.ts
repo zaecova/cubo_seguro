@@ -15,3 +15,6 @@ export * from './riskInput';
 export * from './source';
 export * from './sourceInventory';
 export * from './sourceStatus';
+export * from './syncJob';
+export * from './syncJobPhase';
+export * from './syncJobStatus';

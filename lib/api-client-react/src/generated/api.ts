@@ -23,7 +23,8 @@ import type {
   HealthStatus,
   RiskAnalysis,
   RiskInput,
-  SourceInventory
+  SourceInventory,
+  SyncJob
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -124,6 +125,77 @@ export function useGetSources<TData = Awaited<ReturnType<typeof getSources>>, TE
 
 
 
+export const getGetSyncStatusUrl = () => {
+
+
+
+
+  return `/api/cyber/sync`
+}
+
+export const getSyncStatus = async ( options?: Parameters<typeof customFetch>[1]): Promise<SyncJob> => {
+
+  return customFetch<SyncJob>(getGetSyncStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSyncStatusQueryKey = () => {
+    return [
+    `/api/cyber/sync`
+    ] as const;
+    }
+
+
+export const getGetSyncStatusQueryOptions = <TData = Awaited<ReturnType<typeof getSyncStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSyncStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSyncStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSyncStatus>>> = ({ signal }) => getSyncStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSyncStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSyncStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getSyncStatus>>>
+export type GetSyncStatusQueryError = ErrorType<unknown>
+
+
+
+export function useGetSyncStatus<TData = Awaited<ReturnType<typeof getSyncStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSyncStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSyncStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getSyncSourcesUrl = () => {
 
 
@@ -132,9 +204,9 @@ export const getSyncSourcesUrl = () => {
   return `/api/cyber/sync`
 }
 
-export const syncSources = async ( options?: Parameters<typeof customFetch>[1]): Promise<SourceInventory> => {
+export const syncSources = async ( options?: Parameters<typeof customFetch>[1]): Promise<SyncJob> => {
 
-  return customFetch<SourceInventory>(getSyncSourcesUrl(),
+  return customFetch<SyncJob>(getSyncSourcesUrl(),
   {
     ...options,
     method: 'POST'

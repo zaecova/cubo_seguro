@@ -54,7 +54,9 @@ export function reportText(ev: Evaluation, language: Language = "es") {
   const example = a.id.startsWith("ejemplos-mccumber-");
   const L: string[] = [];
   L.push(l("CUBO SEGURO — INFORME DE PROPUESTAS APROBADAS", "CUBO SEGURO — APPROVED PROPOSALS REPORT"), "=".repeat(48), "");
-  L.push(`${l("Riesgo", "Risk")}: ${a.input.title}`, `${l("Amenaza", "Threat")}: ${a.input.threat}`, `${l("Vulnerabilidad", "Vulnerability")}: ${a.input.vulnerability}`, `${l("Información", "Information")}: ${a.input.information}`, "");
+  L.push(`${l("Riesgo", "Risk")}: ${a.input.title}`);
+  if (a.input.content) L.push(`${l("Contenido", "Content")}: ${a.input.content}`, "");
+  else L.push(`${l("Amenaza", "Threat")}: ${a.input.threat}`, `${l("Vulnerabilidad", "Vulnerability")}: ${a.input.vulnerability}`, `${l("Información", "Information")}: ${a.input.information}`, "");
   L.push(l("Solo se incluyen propuestas aprobadas explícitamente por una persona. Las pendientes y rechazadas se excluyen.", "Only proposals explicitly approved by a person are included. Pending and rejected proposals are excluded."), "");
   const ap = approved(ev);
   if (!ap.length) L.push(l("(No hay propuestas aprobadas.)", "(No approved proposals.)"));

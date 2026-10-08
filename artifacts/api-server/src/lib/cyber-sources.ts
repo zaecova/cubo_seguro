@@ -1,12 +1,45 @@
 import { ReplitConnectors } from "@replit/connectors-sdk";
-import { GetSourcesResponse } from "@workspace/api-zod";
+import { GetSourcesResponse, GetSyncStatusResponse } from "@workspace/api-zod";
+import { randomUUID } from "node:crypto";
 import type { z } from "zod";
 import { downloadDrivePdf, MAX_PDF_BYTES, PDF_SIZE_ERROR } from "./pdf-text";
 
 type Inventory = z.infer<typeof GetSourcesResponse>;
 const rootFolder = { id: "1rXkfXrQTjHm-u8f9ilHTVV6nZlo5VchJ", name: "Gestión de ciberseguridad" };
 let cache: Inventory | undefined;
-let inFlight: Promise<Inventory> | undefined;
+type Job = z.infer<typeof GetSyncStatusResponse>;
+let job: Job = {
+  id: "", status: "idle", phase: "idle", discovered: 0, processed: 0, errors: 0,
+  currentFile: "", startedAt: "", finishedAt: "", error: "", hasInventory: false,
+};
+
+export function getSyncStatus(): Job {
+  return { ...job, hasInventory: !!cache };
+}
+
+export function startSync(): Job {
+  if (job.status === "running") return getSyncStatus();
+  job = {
+    id: randomUUID(), status: "running", phase: "inventory", discovered: 0, processed: 0,
+    errors: 0, currentFile: "", startedAt: new Date().toISOString(), finishedAt: "",
+    error: "", hasInventory: !!cache,
+  };
+  // Detached from HTTP; keep the previous complete snapshot until load succeeds.
+  void load().then(value => {
+    cache = value;
+    job.status = "succeeded";
+    job.phase = "complete";
+  }).catch(() => {
+    job.status = "failed";
+    job.error = "No se pudo sincronizar Google Drive. Se conserva el último inventario completo. Vuelve a intentarlo.";
+  }).finally(() => {
+    job.currentFile = "";
+    job.finishedAt = new Date().toISOString();
+  });
+  return getSyncStatus();
+}
+
+export function getCompletedSources(): Inventory | undefined { return cache; }
 
 async function load(): Promise<Inventory> {
   const connector = new ReplitConnectors();
@@ -42,6 +75,8 @@ async function load(): Promise<Inventory> {
         }
         if (seenFiles.has(file.id)) continue;
         seenFiles.add(file.id);
+        job.discovered++;
+        job.currentFile = file.name;
         const source: Inventory["sources"][number] = {
           id: file.id, name: file.name, folder: folder.name,
           url: file.webViewLink || `https://drive.google.com/file/d/${encodeURIComponent(file.id)}/view`, status: "pending", text: "",
@@ -51,6 +86,7 @@ async function load(): Promise<Inventory> {
         };
         if (file.mimeType === "application/pdf") {
           pdfJobs.push(async () => {
+            job.currentFile = file.name;
             try {
               if (Number(file.size) > MAX_PDF_BYTES) throw new Error(PDF_SIZE_ERROR);
               const extracted = await downloadDrivePdf(file.id);
@@ -64,6 +100,8 @@ async function load(): Promise<Inventory> {
                 ? error.message
                 : "No se pudo extraer el PDF: puede estar protegido, dañado o no disponible. No se utiliza como evidencia; vuelve a sincronizar.";
             }
+            job.processed++;
+            if (source.status === "error") job.errors++;
           });
         }
         if (["application/vnd.google-apps.document", "application/vnd.google-apps.presentation"].includes(file.mimeType)) {
@@ -82,11 +120,16 @@ async function load(): Promise<Inventory> {
           }
         }
         sources.push(source);
+        if (file.mimeType !== "application/pdf") {
+          job.processed++;
+          if (source.status === "error") job.errors++;
+        }
       }
       pageToken = data.nextPageToken || "";
     } while (pageToken);
   }
   // Bound parallel downloads and parsing to avoid exhausting memory.
+  job.phase = "pdf";
   let nextJob = 0;
   await Promise.all(Array.from({ length: Math.min(1, pdfJobs.length) }, async () => {
     while (nextJob < pdfJobs.length) await pdfJobs[nextJob++]();
@@ -101,8 +144,9 @@ async function load(): Promise<Inventory> {
   });
 }
 
-export async function getSources(force = false): Promise<Inventory> {
-  if (!force && cache && Date.now() - Date.parse(cache.syncedAt) < 300_000) return cache;
-  if (!inFlight) inFlight = load().then(value => { cache = value; return value; }).finally(() => { inFlight = undefined; });
-  return inFlight;
+export function getSources(): Inventory {
+  return cache ?? {
+    sources: [], syncedAt: "",
+    warning: "Aún no hay un inventario completo. Sincroniza los documentos desde la evaluación.",
+  };
 }

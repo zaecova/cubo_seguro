@@ -1,13 +1,12 @@
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useHealthCheck } from "@workspace/api-client-react";
-import { Boxes, History, LayoutGrid, Menu, ShieldCheck, X, Info } from "lucide-react";
+import { Boxes, History, Menu, ShieldCheck, X, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LanguageSelector, useI18n } from "@/lib/i18n";
 
 const NAV = [
   { href: "/modelo", label: "Modelo McCumber", icon: Boxes },
-  { href: "/", label: "Resumen", icon: LayoutGrid },
   { href: "/evaluaciones", label: "Evaluaciones", icon: History },
 ];
 

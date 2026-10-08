@@ -53,7 +53,10 @@ export default function Review() {
       <div className="grid gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
           <div className="rounded-xl border border-card-border bg-card p-5 text-sm">
-            {(["threat", "vulnerability", "information"] as const).map((k) => (
+            {a.input.content ? <div>
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{language === "en" ? "Content" : "Contenido"}</div>
+              <p translate="no" className="mt-1 whitespace-pre-wrap leading-relaxed">{a.input.content}</p>
+            </div> : (["threat", "vulnerability", "information"] as const).map((k) => (
               <div key={k} className="mb-4 last:mb-0">
                 <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{k === "threat" ? "Amenaza" : k === "vulnerability" ? "Vulnerabilidad" : "Información afectada"}</div>
                 <p translate="no" className="mt-1 leading-relaxed">{a.input[k]}</p>
