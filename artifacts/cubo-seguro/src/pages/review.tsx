@@ -38,6 +38,10 @@ export default function Review() {
 
   const c = counts(ev);
   const a = ev.analysis;
+  const example = a.id.startsWith("ejemplos-mccumber-");
+  const supported = a.proposals.find(p => p.evidence.some(e => !e.sourceId.startsWith("external:")))
+    ?? a.proposals.find(p => p.evidence.length > 0);
+  const reference = supported?.evidence.find(e => !e.sourceId.startsWith("external:")) ?? supported?.evidence[0];
   const slug = a.input.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
 
   return view(
@@ -79,6 +83,23 @@ export default function Review() {
         </aside>
 
         <div className="space-y-10">
+          {!example ? <>
+            <section className="rounded-xl border-2 border-green-300 bg-green-50 p-5 text-black" data-testid="card-documentary-source">
+              <h2 className="mb-4 flex items-center gap-2 font-display text-2xl"><Quote className="h-5 w-5" />Qué dice la fuente</h2>
+              {reference ? <>
+                <p className="mb-3 text-sm">{language === "en" ? "Reference supporting this part of the analysis:" : "Referencia que respalda esta parte del análisis:"} <span translate="no">{supported?.category}</span></p>
+                <SourceQuote evidence={reference} />
+                <p className="mt-4 text-xs">{language === "en" ? "This quote does not validate the entire AI proposal or prove that controls are implemented." : "Esta cita no valida toda la propuesta de IA ni demuestra que los controles estén implementados."}</p>
+              </> : <p>{language === "en" ? "No verifiable reference was found in the consulted sources. The AI proposal is not documentary evidence." : "No se encontró una referencia verificable en las fuentes consultadas. La propuesta de IA no constituye evidencia documental."}</p>}
+            </section>
+            <section className="rounded-xl border-2 border-blue-300 bg-blue-50 p-5 text-black" data-testid="card-ai-proposal">
+              <h2 className="mb-2 flex items-center gap-2 font-display text-2xl"><Brain className="h-5 w-5" />{language === "en" ? "AI proposal" : "Propuesta generada por IA"}</h2>
+              <p className="mb-4 text-sm">{language === "en" ? "AI interpretation, separate from the documentary quote. Review each part before approving it." : "Interpretación de IA, separada de la cita documental. Revisa cada parte antes de aprobarla."}</p>
+              <div className="divide-y divide-blue-200">
+                {a.proposals.map(p => <ProposalCard key={p.id} p={p} ev={ev} compact onChange={r => setReview(p.id, r)} />)}
+              </div>
+            </section>
+          </> : <>
           {a.proposals.length === 0 && <p className="text-sm text-muted-foreground">El análisis no devolvió propuestas.</p>}
           {DIMENSION_ORDER.map((d) => {
             const ps = a.proposals.filter((p) => p.dimension === d);
@@ -97,13 +118,14 @@ export default function Review() {
               </section>
             );
           })}
+          </>}
         </div>
       </div>
     </div>
   );
 }
 
-export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal; ev: Evaluation; onChange: (r: ProposalReview) => void; example?: boolean }) {
+export function ProposalCard({ p, ev, onChange, example = false, compact = false }: { p: Proposal; ev: Evaluation; onChange: (r: ProposalReview) => void; example?: boolean; compact?: boolean }) {
   const { view } = useI18n();
   const r = ev.reviews[p.id] ?? { status: "pending" };
   const [editing, setEditing] = useState(false);
@@ -139,7 +161,7 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
   );
 
   return view(
-    <article className={`relative rounded-xl border p-5 transition-colors ${tone}`} data-testid={`card-proposal-${p.id}`}>
+    <article className={compact ? "relative py-5" : `relative rounded-xl border p-5 transition-colors ${tone}`} data-testid={`${compact ? "section" : "card"}-proposal-${p.id}`}>
       {r.status !== "pending" && (
         <span className={`pop stamp mb-3 inline-block rounded px-2 py-0.5 font-mono text-[10px] uppercase ${r.status === "approved" ? "text-primary" : "text-destructive"}`} data-testid={`status-proposal-${p.id}`}>
           {r.status === "approved" ? "Aprobada" : "Rechazada"}
@@ -163,7 +185,7 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
           </div>
           {!example && proposalText}
 
-          <div className="mt-4 grid gap-3 xl:grid-cols-2">
+          {compact ? <p translate="no" className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.rationale}</p> : <div className="mt-4 grid gap-3 xl:grid-cols-2">
             <div className="rounded-lg border-2 border-blue-300 border-l-[5px] border-l-blue-700 bg-blue-50 p-4 text-sm text-black shadow-sm">
               <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-blue-900"><Brain className="h-5 w-5 shrink-0" />{example ? "Ejemplo didáctico" : "Inferencia de la IA"}</div>
               {example ? proposalText : <p translate="no" className="leading-relaxed">{p.rationale}</p>}
@@ -183,7 +205,7 @@ export function ProposalCard({ p, ev, onChange, example = false }: { p: Proposal
                 </ul>
               )}
             </div>
-          </div>
+          </div>}
 
           {!editing && (
             <div className="mt-4 flex flex-wrap gap-2">

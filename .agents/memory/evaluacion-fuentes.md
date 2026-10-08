@@ -46,9 +46,9 @@ No mostrar un apartado independiente «Fuentes»; presentar la propuesta de IA j
 
 El usuario pide analizar amenazas y vulnerabilidades con las tres dimensiones de McCumber: principios de seguridad, estados de información y contramedidas. Debe identificar qué información resulta afectada.
 
-Presentar solamente tres propuestas para decidir: una por cada dimensión del cubo. Integrar la información afectada en la propuesta de estados; agrupar las medidas en una sola propuesta de contramedidas.
+Presentar solamente dos tarjetas en el resultado: una con respaldo de fuentes y otra con la propuesta de IA. Conservar las dimensiones del cubo dentro del contenido, no como tarjetas separadas.
 
-**Why:** El usuario pidió reducir las propuestas a tres basadas en las tres dimensiones.
+**Why:** El usuario confirmó explícitamente «Sí: una con respaldo de fuentes y otra con la propuesta de IA», en lugar de dos por dimensión.
 
 La paleta solicitada para este aplicativo es azul, amarillo, verde, naranja, blanco y negro.
 
